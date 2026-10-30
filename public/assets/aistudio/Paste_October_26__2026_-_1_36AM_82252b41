@@ -1,0 +1,677 @@
+# PLOTIFY — PROMPT 45
+## CLIMATE HAZARD & RESILIENCE ANALYZER
+**Account B | Locked Roadmap: P45 of P41–P50**
+
+### 1. MISSION
+
+Implement P45 — Climate Hazard & Resilience Analyzer in the existing Plotify Account B codebase.
+
+The objective is to help users understand how present-day and projected climate hazards may affect a building site, building design, construction assumptions, and long-term use.
+
+P45 must distinguish among:
+
+- Climate hazards: potentially harmful physical climate events or trends.
+- Exposure: whether people, assets, building elements, or infrastructure are located where the hazard may affect them.
+- Vulnerability: how susceptible the exposed building or system may be to harm.
+- Consequences: plausible impacts on safety, building function, service continuity, repair needs, and project performance.
+- Adaptive capacity: the measures available to reduce impacts, respond to changing conditions, and recover from disruption.
+- Residual risk: the risk that remains after proposed protective or adaptation measures are considered.
+
+The workspace should help users identify relevant hazards, understand the evidence and uncertainty, review design vulnerabilities, compare future climate scenarios, and explore potential resilience measures.
+
+Potential hazard categories include extreme heat, heavy precipitation, flooding, drought and water stress, severe wind, tropical cyclones where geographically applicable, wildfire weather, erosion, landslides where suitable evidence exists, and cold, freeze-thaw, or snow-related conditions where relevant.
+
+Only assess hazards for which relevant data, methods, and geographic coverage are available. Do not create a hazard result merely because a category appears in the interface.
+
+**Core principle: data-backed climate-risk screening, not fabricated site precision, unsupported predictions, or a guarantee that a building is safe.**
+
+### 2. NON-NEGOTIABLE SCOPE LOCK
+
+1. Implement P45 only.
+2. Preserve the locked Account B roadmap P41–P50.
+3. Do not implement P46 Building Envelope Performance Analyzer or any later roadmap feature.
+4. Do not rewrite or weaken P41 OpenBIM & IFC Interoperability, P42 CAD Drawing Exchange, P43 Terrain & Topographic Site Modeling, or P44 Embodied & Whole-Life Carbon Assessment.
+5. Inspect the actual source code and contracts before implementation.
+6. Do not assume implementation reports prove that the described code or interfaces exist unchanged.
+7. Do not assume Account A's P30–P40 modules exist in this workspace.
+8. Do not connect to GitHub, push commits, merge branches, or perform cross-account integration.
+9. Do not invent climate observations, projections, hazard-map results, site coordinates, flood depths, wind speeds, temperatures, or probability values.
+10. Do not confuse short-term weather forecasts with long-term climate projections.
+11. Do not present national or coarse-grid climate information as precise property-level hazard evidence.
+12. Do not assume that missing hazard data means low risk or no risk.
+13. Do not claim a structure is resilient, safe, flood-proof, fire-resistant, or code-compliant without appropriate evidence for that specific claim.
+14. Do not infer structural capacity, geotechnical stability, drainage performance, or building-envelope performance from unrelated geometry alone.
+15. Preserve project data, identifiers, source provenance, material specifications, carbon assessments, IFC/CAD metadata, and terrain data.
+16. Do not weaken existing verification tests to make P45 pass.
+17. If reliable data or a required calculation method is unavailable, report the limitation rather than inventing a result.
+
+### 3. INSPECT THE ACTUAL CODEBASE FIRST
+
+Before modifying any files, inspect and document the current repository.
+
+**A. Project and site model**
+
+Inspect:
+- Actual Project type, project identifiers, site location fields, site coordinates, and coordinate reference conventions.
+- Existing `siteContext` structures, terrain assumptions, plot dimensions, site boundaries, elevation information, and obstacles.
+- Existing measurement units and coordinate transformations.
+- Actual 3D building geometry and the relationship between the building, plot, and site.
+- Existing project regulations, design constraints, and scenario data.
+- Any location, weather, climate, flood, risk, resilience, or environmental services that already exist.
+
+Identify whether the project has an actual geographic location, a user-entered address, local coordinates only, or no reliable location.
+
+Do not fabricate geographic coordinates from a city or country name.
+
+**B. P41 — OpenBIM & IFC Interoperability**
+
+Inspect the actual IFC types, provenance records, supported building elements, quantities, and import/export behaviour.
+
+P45 must not infer climate resilience from the existence of IFC elements. Use only properties that have a defensible relationship to the specific assessment.
+
+**C. P42 — CAD Drawing Exchange**
+
+Inspect supported CAD geometry, units, coordinate conventions, and provenance.
+
+Do not infer flood elevations, climate exposure, drainage conditions, wall performance, or structural resistance from ordinary 2D CAD linework.
+
+**D. P43 — Terrain & Topographic Site Modeling**
+
+Inspect:
+- `terrainModeling` and its actual source-data provenance.
+- Supported terrain point and contour structures.
+- Calibrated coordinates, units, CRS, and vertical datum information.
+- Existing-ground TIN surfaces and supported terrain analyses.
+- Terrain point persistence limits and missing-data behaviour.
+- 3D viewer integration.
+
+Determine which terrain metrics are actually available. Do not assume that a terrain visualization provides flood depth, runoff, erosion, soil stability, or drainage capacity.
+
+**E. P44 — Embodied & Whole-Life Carbon Assessment**
+
+Inspect the actual carbon-assessment metadata and calculation services.
+
+Where relevant, use existing embodied-carbon or material information to describe potential adaptation trade-offs. Do not build a second carbon-calculation engine or claim that a resilience intervention is lower-carbon without adequate quantities and compatible emission factors.
+
+**F. Application infrastructure**
+
+Inspect existing:
+- Project storage and persistence limits.
+- Snapshot, checkpoint, versioning, and rollback mechanisms.
+- Navigation and workspace conventions.
+- Source documentation and report-generation facilities.
+- External service configuration and API credential handling.
+- Test suites, verification runner, lint/typecheck commands, and production build.
+
+After inspection, identify reusable components, missing data, planned file changes, integration risks, and the limits of any achievable implementation. Then proceed with the safe, supported implementation rather than stopping at an audit report unless a genuine technical blocker prevents it.
+
+### 4. CLIMATE DATA SOURCES AND SOURCE GOVERNANCE
+
+Design P45 so every climate result is connected to an explicit source, dataset version, geographic scope, and assessment method.
+
+Potential reference sources include:
+
+- **IPCC:** Climate-change impacts, risks, uncertainty, and adaptation evidence.
+  https://www.ipcc.ch/report/ar6/syr/summary-for-policymakers/
+
+- **Copernicus Climate Data Store:** Historical climate information, climate projections, and model-ensemble data.
+  https://climate.copernicus.eu/climate-data-store
+
+- **World Bank Climate Change Knowledge Portal:** Historical and projected climate information, including CMIP6 datasets.
+  https://climateknowledgeportal.worldbank.org/
+
+- **FEMA Flood Map Service Center:** Official U.S. flood-hazard map information within its jurisdictional scope.
+  https://msc.fema.gov/portal/home
+
+- **Pakistan Meteorological Department Flood Forecasting Division:** Relevant flood monitoring and forecasts for its supported Pakistan river systems.
+  https://ffd.weather.gov.pk/
+
+These links are reference sources, not proof that a working API or data integration exists in the application.
+
+For each source:
+1. Check its actual coverage, available variables, spatial resolution, temporal coverage, update status, licensing, and access requirements.
+2. Identify whether its data represents observations, historical simulations, forecasts, projections, official hazard mapping, or general guidance.
+3. Verify the applicable version and source documentation.
+4. Record the data retrieval date or dataset version when applicable.
+5. Document the source's limitations.
+6. Keep jurisdiction-specific authoritative maps distinct from broad climate-projection datasets.
+
+Do not assume that an official source provides the same level of detail for every country, hazard, or property.
+
+For projected climate hazards, retain the model, scenario, baseline period, projection period, and relevant dataset metadata where available. Do not present a model projection as a deterministic prediction of exactly what will happen to an individual building.
+
+If an external source cannot actually be accessed, report it as unavailable or unconfigured. Do not simulate a successful API response with invented data.
+
+### 5. DATA CONNECTORS AND OFFLINE BEHAVIOUR
+
+Inspect the existing architecture before implementing external data connectors.
+
+Where a genuine usable source is available, implement a modular adapter for the supported data service.
+
+A climate-source adapter should define:
+- Supported hazards and variables.
+- Geographic coverage.
+- Input coordinate requirements.
+- Supported spatial and temporal resolutions.
+- Units and data formats.
+- Dataset or API version.
+- Authentication or API-key requirements, if any.
+- Request limits and source-access restrictions.
+- Error and timeout behaviour.
+- Attribution and source citations.
+- Data freshness and cache-expiration policy.
+
+Requirements:
+
+- Never put secret API keys into browser-delivered code.
+- Reuse existing server-side integration conventions where available.
+- Do not introduce paid services or hidden subscription requirements.
+- Do not add an external dependency without reviewing compatibility, licensing, maintenance, cost, and security implications.
+- Do not make the whole workspace fail merely because one optional climate data source is unavailable.
+- Clearly distinguish live-source results from previously cached results.
+- Never label cached historical data as current.
+- Never return fabricated default hazard values after an API failure.
+
+If no suitable live data connector exists, implement a functional user-controlled evidence-import or manual-input workflow only where its semantics can be validated. Label such records as user-provided rather than externally verified.
+
+A saved project must remain usable when no external network or climate data service is available.
+
+### 6. LOCATION, COORDINATES, AND SPATIAL VALIDATION
+
+Correct site location is essential to climate-risk assessment.
+
+Implement a location preflight step that identifies the available site-location evidence.
+
+Possible cases include:
+- Explicit geographic coordinates.
+- A properly geocoded address from a supported service.
+- A user-confirmed location derived from an available mapping workflow.
+- Project-local coordinates without a known geographic reference.
+- Missing or ambiguous location information.
+
+For each case:
+1. Identify the supported location confidence.
+2. Validate coordinate range and coordinate order.
+3. Preserve the source and transformation provenance.
+4. Require confirmation when critical location details are ambiguous.
+5. Do not treat local plot coordinates as geographic coordinates.
+6. Do not geocode an address without a genuine supported method.
+7. Do not infer precise coordinates from a general location label.
+8. Avoid displaying false precision in the UI.
+
+When using gridded climate or hazard data:
+- Determine whether the site falls within valid dataset coverage.
+- Record grid resolution and sampling method.
+- Explain when multiple locations within one grid cell cannot be distinguished.
+- Avoid overstating precision near coasts, rivers, steep terrain, or hazard boundaries.
+- Do not imply that a point sample describes the entire parcel when the parcel spans several cells or hazard zones.
+
+If site location is inadequate for spatial risk assessment, provide general regional context only where supported and mark site-specific results as unassessed.
+
+### 7. CLIMATE HAZARD CATALOG
+
+Create a typed, extensible hazard catalog using actual supported inputs and calculation methods.
+
+Potential categories are described below. Implement only the applicable, evidence-supported subset.
+
+**A. Extreme heat and heat stress**
+
+Potential indicators:
+- Historical maximum temperatures.
+- Hot-day frequency.
+- Duration or frequency of heatwaves where a defensible definition and dataset exist.
+- Projected changes in relevant temperature metrics.
+- Indoor or outdoor heat-exposure indicators only where the necessary building or human-exposure model exists.
+
+Do not derive indoor overheating or occupant thermal comfort solely from outdoor temperature.
+
+P45 must not implement P46's dedicated building-envelope performance engine.
+
+**B. Extreme precipitation**
+
+Potential indicators:
+- Historical or projected precipitation intensity.
+- Heavy-precipitation frequency.
+- Changes in precipitation extremes for documented thresholds and periods.
+
+Rainfall intensity alone does not establish parcel flood depth or building inundation.
+
+**C. Flooding**
+
+Separate the supported flood concepts:
+- Riverine/fluvial flooding.
+- Pluvial or surface-water flooding.
+- Coastal flooding or storm surge where geographically relevant.
+- Official mapped flood zones.
+- Flood observations or historical events.
+- Climate-related changes in precipitation or coastal conditions.
+
+Use actual applicable hazard data.
+
+Do not calculate precise flood depth, flow velocity, arrival time, or building inundation solely from generic climate projections or P43's existing-ground terrain mesh.
+
+A defensible site-level flood analysis may need hydrology, drainage, river or coastal boundary conditions, water levels, a hydraulic model, and verified ground and building elevations. If these inputs are absent, report the supported hazard indicator and explicitly state what cannot be assessed.
+
+Never claim that a site is flood-safe just because the available map shows no designated hazard.
+
+**D. Drought and water stress**
+
+Where reliable data exists, assess relevant precipitation deficits, drought indicators, or regional water-stress information.
+
+Do not equate a national drought indicator with a property-level water-supply assessment.
+
+**E. Severe wind and tropical cyclones**
+
+Use supported historical or projected wind-related indicators and authoritative hazard sources.
+
+Do not convert a general cyclone-risk category into a precise design wind speed without the relevant data, applicable design method, exposure category, and code context.
+
+Do not claim structural resistance based on climate hazard information alone.
+
+**F. Wildfire weather**
+
+Where supported, assess relevant heat, dryness, wind, or official wildfire-hazard information.
+
+Do not infer property-specific ignition probability, fire spread, or building ignition resistance from a generic climate index.
+
+**G. Erosion, landslides, and slope-related hazards**
+
+Use only suitable, validated evidence for the relevant hazard.
+
+P43 terrain points or a triangulated surface do not establish soil properties, groundwater conditions, slope stability, erosion rates, or landslide probability.
+
+Require appropriate geotechnical or hazard data where needed and mark unsupported conditions as unassessed.
+
+**H. Cold, snow, freeze-thaw, and other regional hazards**
+
+Implement these only where geographically and climatically relevant and where suitable data and a documented assessment method are available.
+
+Do not create zero-risk results for hazards simply because the selected data source does not cover them.
+
+### 8. CURRENT CONDITIONS, HISTORICAL BASELINES, AND FUTURE SCENARIOS
+
+Separate three fundamentally different data contexts:
+
+1. **Current or recent observations:** Recorded environmental conditions for a clearly defined period.
+2. **Historical climate and hazard baselines:** Past observations, analyses, or historical model products used as a reference.
+3. **Future climate projections:** Model-derived outcomes that depend on emissions scenarios, model assumptions, periods, and natural climate variability.
+
+Never interchange them without explicit explanation.
+
+For future scenarios:
+- Use only scenarios supported by the selected dataset.
+- Retain the scenario identifier and time horizon.
+- Record the baseline/reference period.
+- Distinguish model-specific results from multi-model summaries.
+- Report uncertainty or spread where the source supplies it.
+- Avoid selecting a single optimistic or pessimistic scenario without explaining why.
+- Do not claim a particular projected outcome is certain.
+
+Where the data supports multiple projection periods, provide meaningful comparison horizons appropriate to the project's expected service life. Do not impose a universal design life.
+
+If a user has not specified an assessment horizon, offer a clearly labelled default only where a documented profile justifies it and allow the user to change it.
+
+For data sources with coarse spatial resolution, explicitly warn users that the result may not represent a building-scale microclimate or local flood condition.
+
+### 9. VULNERABILITY AND EXPOSURE MAPPING
+
+Hazard presence alone is not a complete risk assessment.
+
+Where the project contains suitable data, identify which building or site elements may be exposed to the assessed hazard.
+
+Potential elements include:
+- Building location and footprint.
+- Relevant floors or below-ground spaces, where represented.
+- Building entrances and known openings.
+- Material or component properties, where actual data exists.
+- Existing terrain elevation and site position.
+- Important MEP equipment and utilities, where represented.
+- Structural elements, without assuming their structural capacity.
+- Relevant external access or site infrastructure, where available.
+
+For each mapping:
+1. Identify the source geometry or attribute.
+2. Establish the spatial relationship to the hazard dataset.
+3. Record coordinate and elevation compatibility.
+4. Explain when the mapping is approximate.
+5. Distinguish directly observed exposure from inferred exposure.
+6. Keep missing building properties unassessed.
+
+Potential vulnerability categories may include:
+- Heat sensitivity of known materials or spaces, where data supports it.
+- Potential water-entry exposure of known openings or below-ground spaces.
+- Potential interruption of access or utilities.
+- Moisture- or freeze-thaw-related material concerns where supported.
+- Potential service disruption or loss of functionality.
+
+Do not infer a material's exact fire resistance, moisture durability, thermal performance, or wind resistance from its category alone.
+
+If critical attributes are unknown, state what must be inspected or supplied.
+
+### 10. TRANSPARENT RISK EVALUATION
+
+Implement a deterministic, documented method for risk screening.
+
+A conceptual assessment should consider:
+
+- Hazard likelihood or frequency, when a compatible source supports it.
+- Hazard magnitude or intensity.
+- Exposure of the asset or building component.
+- Vulnerability or susceptibility of the exposed element.
+- Plausible consequence, where a valid method exists.
+- Adaptive capacity or existing protective measures, when evidenced.
+- Residual risk following a proposed intervention, when the intervention effect is defensible.
+
+Do not multiply arbitrary 1–5 scores and call the result a scientifically validated climate-risk probability.
+
+If a qualitative matrix is used:
+- Document every category definition.
+- Explain how ratings are assigned.
+- Identify which ratings come from source data and which from user assessment.
+- Define how missing evidence is handled.
+- Separate hazard indicators from overall risk categories.
+- Do not use a high data-confidence badge to imply low risk.
+- Do not allow a missing hazard record to lower the total risk score.
+- Keep uncertainty visible in the findings.
+
+If sufficient evidence for an overall rating is not available, present the individual indicators and limitations without producing a total score.
+
+For each result, provide an explanatory evidence trace that includes the dataset, time period, relevant location, calculation, assumptions, and unavailable information.
+
+### 11. RESILIENCE MEASURES AND ADAPTATION OPTIONS
+
+Provide a catalogue of potential resilience measures only where their connection to a supported finding is understandable.
+
+Possible categories include:
+
+- Passive heat-risk reduction options, such as shading or improved solar control.
+- Heat adaptation through suitable ventilation or cooling strategies, where building data supports evaluation.
+- Rainwater-management and drainage options as conceptual suggestions, without claiming hydraulic performance that has not been modelled.
+- Flood-exposure mitigation concepts where applicable.
+- Water conservation and drought adaptation.
+- Wind-related design review prompts.
+- Fire-weather risk-reduction measures where relevant.
+- Maintenance, inspection, monitoring, and emergency-planning considerations.
+- Site-access and service-continuity measures.
+
+Every suggestion must:
+1. Refer to an identified risk finding.
+2. Explain the intended risk-reduction mechanism.
+3. Identify the evidence supporting the suggestion.
+4. State which performance effects are established and which are uncertain.
+5. Identify relevant trade-offs and prerequisites.
+6. Preserve the original design in a preview until the user confirms a supported modification.
+7. Avoid claiming statutory compliance or engineering sufficiency.
+
+Do not produce an automatic "resilient" label merely because a user selects an adaptation option.
+
+When intervention impacts cannot be calculated, describe them as qualitative suggestions rather than numerical reductions.
+
+### 12. P43 TERRAIN COMPATIBILITY
+
+Use the actual P43 terrain interface only after inspecting its definitions.
+
+Potentially useful P43 data may include:
+- Calibrated site coordinates.
+- Existing-ground elevation points.
+- Terrain boundaries.
+- Supported local slope or section information.
+- Coordinate reference and vertical-datum provenance.
+- Source-data completeness and accuracy warnings.
+
+Requirements:
+- Respect horizontal and vertical datum semantics.
+- Do not assume the terrain mesh is survey-grade.
+- Do not infer precise flood depth from terrain elevation alone.
+- Do not derive runoff, drainage capacity, erosion rates, or slope stability without suitable methods and inputs.
+- Do not ignore the P43 persisted-point limit or provenance restrictions.
+- Do not silently alter terrain or building elevations during P45 assessment.
+- Do not claim a site is safe from hazards because a visual terrain layer appears reasonable.
+
+Use P43 as an evidence source with explicit limitations, not as a substitute for hydrology or geotechnical modelling.
+
+### 13. P44 WHOLE-LIFE CARBON COMPATIBILITY
+
+Inspect the actual P44 interfaces and assessment metadata before using them.
+
+Where an adaptation option may change materials, quantities, energy use, or maintenance:
+- Identify which P44 data may be relevant.
+- Distinguish an established carbon-assessment result from a hypothetical scenario.
+- Avoid double counting emissions or duplicating the carbon engine.
+- Keep carbon impacts separate from climate hazard severity.
+- Do not claim an option is lower-carbon without compatible quantities, factors, and lifecycle boundaries.
+- Do not automatically select an adaptation option because it reduces carbon if it fails to address a critical hazard.
+
+Keep hazard risk, resilience performance, and lifecycle carbon as distinct decision dimensions.
+
+P45 may display an existing carbon result as contextual evidence, but must not implement P44 again.
+
+### 14. FUTURE ROADMAP BOUNDARIES: P46–P50
+
+Keep P45 focused on climate hazard and resilience analysis.
+
+- **P46 — Building Envelope Performance Analyzer:** Do not build a dedicated thermal, moisture, or envelope simulation engine.
+- **P47 — Construction Site Logistics Planner:** Do not implement site logistics planning.
+- **P48 — Augmented Reality Site Visualization:** Do not implement AR functionality.
+- **P49 — Immersive VR Design Review:** Do not implement VR functionality.
+- **P50 — Live Multi-User Design Collaboration:** Do not implement real-time collaboration or synchronization.
+
+If one of these future modules would provide useful data, document the interface needed later rather than inventing the functionality now.
+
+### 15. DATA MODEL, PROVENANCE, AND PERSISTENCE
+
+Inspect the existing Project type and metadata conventions before defining new contracts.
+
+Create a minimal, backward-compatible climate-assessment model only where needed. Possible concepts include:
+
+- Assessment profile and version.
+- Project identifier.
+- Site-location evidence and coordinate reference.
+- Hazard catalog entry.
+- Source dataset and version metadata.
+- Historical or projected time period.
+- Scenario and model metadata.
+- Hazard indicator and its units.
+- Exposure mapping.
+- Vulnerability and consequence notes.
+- Evidence and uncertainty summaries.
+- Resilience option and its supporting finding.
+- Assessment timestamp.
+- Project-state fingerprint or assessment freshness marker.
+- Warnings, missing-data reasons, and source references.
+
+These are conceptual fields; use the real repository conventions and introduce only what is necessary.
+
+Requirements:
+1. Keep climate-assessment results distinct from existing IFC, CAD, terrain, and carbon metadata.
+2. Use stable identifiers.
+3. Avoid duplicating the complete project inside each assessment.
+4. Keep source data and derived results distinguishable.
+5. Preserve source attribution and relevant licence information.
+6. Handle missing or older project metadata safely.
+7. Mark results stale if relevant site information or source data changes.
+8. Do not silently overwrite previous results with an unavailable or failed data request.
+9. Respect storage limits.
+10. Use the existing persistence and versioning architecture.
+11. Ensure failed or cancelled operations do not leave partial project updates.
+12. Preserve unrelated project fields.
+
+Do not store large raw climate grids in project metadata if the current architecture cannot safely support them. Use a documented size limit or a supported reference/summary model without silently truncating data.
+
+### 16. UI AND USER WORKFLOW
+
+Implement a guided Climate Hazard & Resilience workspace using existing Plotify conventions.
+
+Suggested stages:
+
+1. **Site & Scope:** Confirm location, assessment profile, target period, and data requirements.
+2. **Data Readiness:** Inspect supported sources, dataset quality, coverage, and missing inputs.
+3. **Hazard Explorer:** Review each supported hazard and its historical or projected indicators.
+4. **Exposure & Vulnerability:** Inspect affected site/building elements and their known characteristics.
+5. **Risk Findings:** View the transparent evidence-based assessment and uncertainty.
+6. **Resilience Options:** Explore potential mitigation or adaptation measures without silently editing the project.
+7. **Report & Provenance:** Review sources, calculation methods, limitations, and outstanding actions.
+
+The workspace should include:
+- Clear maps or site overlays only where valid geospatial data is available.
+- Hazard-specific visualizations.
+- Distinction between observed data and future projections.
+- Scenario and time-horizon selectors where supported.
+- Evidence and source details for each finding.
+- Unavailable-data warnings.
+- Explicit stale-data indicators.
+- A way to review and export the assessment report.
+
+Do not use a red/green risk map alone to communicate important findings. Include textual explanations, data confidence, and assessment limitations.
+
+Provide accessible controls, keyboard navigation, visible focus, meaningful labels, and screen-reader-accessible status messages.
+
+### 17. SECURITY, PERFORMANCE, AND FAILURE HANDLING
+
+- Validate all external or user-imported data.
+- Validate coordinates, dates, units, ranges, and dataset metadata.
+- Apply reasonable input-size and processing limits.
+- Handle API timeouts, rate limits, authentication failures, unavailable sources, and malformed responses.
+- Avoid exposing secret keys in frontend bundles.
+- Prevent stale requests from overwriting newer assessments.
+- Bound geospatial processing and avoid unbounded raster or grid operations.
+- Use caching only with transparent source timestamps and documented expiry.
+- Do not silently convert service failures into a low-risk result.
+- Keep the project usable if optional climate sources are unavailable.
+- Do not claim an operation completed until it actually succeeds.
+
+If a dataset is not sufficiently precise for the requested property-level calculation, refuse that specific calculation gracefully and explain the missing evidence.
+
+### 18. TESTING AND REGRESSION
+
+Create a dedicated P45 test suite and register it in the actual verification runner using existing conventions.
+
+Test the applicable cases below.
+
+**A. Location and spatial data**
+- Valid and invalid geographic coordinates.
+- Unknown CRS or ambiguous coordinate order.
+- Site location missing or only partially known.
+- Gridded data lookup and cell-resolution limitations.
+- Boundary and out-of-coverage locations.
+- Terrain CRS and vertical-datum compatibility.
+- Site polygons spanning multiple grid cells.
+
+**B. Climate-source handling**
+- Valid and invalid source metadata.
+- Historical versus projected data distinctions.
+- Scenario, baseline-period, and projection-horizon tracking.
+- Missing values, malformed responses, and unavailable providers.
+- Out-of-date cached information.
+- Source attribution and licensing metadata.
+- No invented fallback values.
+
+**C. Hazard calculations**
+- Each implemented hazard indicator using fixtures with known expected outputs.
+- Correct units and temporal periods.
+- Hazards not applicable or unsupported.
+- No false low-risk state from absent data.
+- Uncertainty or multi-model variation where supported.
+- Hazard indicator versus overall risk distinction.
+
+**D. Exposure, vulnerability, and risk**
+- Correct spatial association with project elements where supported.
+- Missing building attributes.
+- Unknown material or structural capability.
+- Incomplete or uncertain exposure.
+- Documented qualitative risk-matrix logic if implemented.
+- Risk assessment changes when relevant source inputs change.
+
+**E. Resilience options**
+- Suggestions reference valid risk findings.
+- Preview does not mutate the saved design.
+- Applying a supported change requires explicit confirmation.
+- Unsupported benefit claims are not created.
+- P44 carbon results are not duplicated or silently reinterpreted.
+
+**F. Regression and project safety**
+- P41 IFC operations.
+- P42 CAD operations.
+- P43 terrain persistence, provenance, and viewer integration.
+- P44 carbon-assessment metadata and calculations.
+- Existing project persistence and snapshot/rollback.
+- Legacy projects with no P45 metadata.
+- Failed and cancelled updates preserve project state.
+
+**G. System verification**
+- Run the P45 test suite.
+- Run relevant P41–P44 regression suites available in the repository.
+- Inspect and execute the actual full verification runner.
+- Run the true TypeScript/lint checks.
+- Run the production build.
+
+Report actual commands, executed suite counts, failures, and results. Do not remove or weaken tests to obtain a passing run. Small synthetic fixtures do not prove real-world property-level climate-risk accuracy.
+
+### 19. DOCUMENTATION
+
+Create a specification using repository conventions, such as:
+
+`docs/P45_CLIMATE_HAZARD_RESILIENCE_ANALYZER_SPECIFICATION.md`
+
+Document:
+- Initial codebase inspection.
+- Supported hazard categories.
+- Actual source providers and available data.
+- Jurisdictional and geographic limitations.
+- Current, historical, and projected data distinctions.
+- Coordinate and spatial-resolution handling.
+- Assessment methodology and uncertainty.
+- Exposure/vulnerability mapping.
+- Risk findings and resilience-option logic.
+- P43 terrain and P44 carbon interfaces actually used.
+- Data model and project persistence.
+- Tests actually executed and results.
+- Known limitations and unresolved defects.
+- Future integration requirements and P46–P50 boundaries.
+
+Do not document a planned external integration or unsupported hazard calculation as already implemented.
+
+### 20. ACCEPTANCE CRITERIA
+
+P45 is ready for review only when:
+
+1. The actual project and P41–P44 interfaces have been inspected.
+2. Supported hazards and data sources are explicitly documented.
+3. Observations, historical baselines, forecasts, and future projections are distinct.
+4. Site coordinates and data resolution are handled honestly.
+5. Risk assessments separate hazard, exposure, vulnerability, and consequence.
+6. Missing data never silently becomes zero risk.
+7. Uncertainty and scenario dependencies are visible.
+8. P43 terrain and P44 carbon data are reused only through actual compatible interfaces.
+9. No unsupported flood, structural, geotechnical, or building-envelope claims are made.
+10. Resilience options are explainable and preserve the user's design until confirmed.
+11. Project persistence and P41–P44 behaviour remain intact.
+12. P45 tests and relevant regression suites have actually been executed.
+13. TypeScript/lint and production-build results are reported accurately.
+14. Known limitations and future integration dependencies are documented.
+15. P46–P50 have not been implemented.
+16. No GitHub operation or cross-account integration has occurred.
+17. P45 is not marked Verified, Approved, or Complete unless the required checks genuinely passed.
+
+### 21. REQUIRED FINAL IMPLEMENTATION REPORT
+
+Provide a structured final report containing:
+
+1. Initial architecture findings.
+2. Exact files created and modified.
+3. Supported hazards and actual source datasets.
+4. Geographic coverage, units, temporal periods, and data-resolution limitations.
+5. Implemented risk-assessment methodology.
+6. Source provenance, uncertainty, and missing-data behaviour.
+7. Exposure/vulnerability mapping and its limitations.
+8. Resilience suggestions and what their effects can genuinely establish.
+9. P41–P44 compatibility and regression results.
+10. Persistence, data integrity, and error-handling behaviour.
+11. Exact test commands, outcomes, and actual suite counts.
+12. TypeScript/lint and production-build results.
+13. Known defects, unimplemented hazards, and data-source limitations.
+14. Shared-file changes, dependencies, and future integration risks.
+15. Confirmation that P46–P50, GitHub operations, and cross-account integration were not performed.
+16. Acceptance criteria that passed, failed, or remain unverified.
+
+**Final priority: trustworthy climate evidence, transparent risk reasoning, geographic accuracy, clear uncertainty, practical resilience guidance, and maintainable future integration. Never manufacture certainty to make a dashboard look complete.**

@@ -1,0 +1,700 @@
+# PLOTIFY — PROMPT 44
+## EMBODIED & WHOLE-LIFE CARBON ASSESSMENT
+**Account B | Locked Roadmap: P44 of P41–P50**
+
+### 1. MISSION
+
+Implement P44 — Embodied & Whole-Life Carbon Assessment in the existing Plotify Account B codebase.
+
+The objective is to provide a transparent, evidence-based carbon assessment workspace for architectural projects. Users should be able to understand the estimated greenhouse-gas impacts of building materials, construction, maintenance, replacement, operational energy and water use, and end-of-life processes wherever sufficient reliable project data exists.
+
+The feature must help users:
+
+- Understand the difference between upfront embodied carbon, total embodied carbon, operational carbon, and whole-life carbon.
+- Identify which building elements and materials contribute most to the calculated impacts.
+- Inspect the quantities, emission factors, sources, assumptions, and formulas behind each result.
+- Import or enter legitimate carbon-factor data with clear provenance.
+- Compare supported design or material scenarios without presenting uncertain results as verified facts.
+- Identify missing information that prevents a complete assessment.
+- Explore evidence-based carbon-reduction opportunities without silently changing the design.
+- Export a transparent assessment report that can be reviewed by architects, engineers, sustainability professionals, or other qualified assessors.
+
+**Core principle: no fabricated emission factors, no hidden calculation assumptions, no double counting, and no claim of a complete whole-life assessment when important lifecycle data is missing.**
+
+P44 is a decision-support and carbon-screening feature. The level of detail and confidence of each result must match the quality of the underlying evidence.
+
+### 2. NON-NEGOTIABLE SCOPE LOCK
+
+1. Implement P44 only.
+2. Preserve the locked Account B roadmap from P41 through P50.
+3. Do not implement P45 Climate Hazard & Resilience Analyzer or any later roadmap feature.
+4. Do not rewrite or weaken P41 OpenBIM & IFC Interoperability, P42 CAD Drawing Exchange, or P43 Terrain & Topographic Site Modeling.
+5. Inspect actual code and interfaces before changing any file.
+6. Do not assume that Account A's P30–P40 modules or service contracts exist in this workspace.
+7. Do not connect to GitHub, push commits, merge branches, or perform cross-account integration.
+8. Do not invent material quantities, carbon factors, EPD records, energy consumption, building lifespans, replacement cycles, or recycling benefits.
+9. Do not silently treat missing data as zero emissions.
+10. Do not mix factors with incompatible units, lifecycle boundaries, geography, or declared units.
+11. Do not subtract Module D benefits from A–C results without clear disclosure and a separately reported calculation.
+12. Do not claim certification, formal compliance, or professional verification unless the complete applicable requirements have actually been satisfied and independently reviewed where required.
+13. Do not present generic material factors as product-specific environmental product declarations.
+14. Do not modify primary building geometry simply to improve carbon results.
+15. Preserve existing project state, identifiers, material data, CAD/IFC provenance, terrain metadata, and unrelated functionality.
+16. Do not weaken existing tests to make P44 pass.
+17. If a capability cannot be implemented reliably, provide a clear limitation or an unavailable result instead of inventing a substitute.
+
+### 3. INSPECT THE ACTUAL CODEBASE FIRST
+
+Before editing any files, inspect the current repository and document the findings relevant to P44.
+
+Inspect:
+
+**Project and material information**
+- The actual Project type, measurement units, storey representation, rooms, plot dimensions, and supported geometry.
+- Existing material specifications, facade assemblies, construction-cost data, and other material or element classifications.
+- Existing structural data, columns, beams, building components, and any reliable quantities or dimensions.
+- Existing energy, water, environmental, or site information that may be relevant to the assessment.
+- Whether material quantities, material densities, component thicknesses, areas, volumes, and replacement information genuinely exist.
+
+**P41 — OpenBIM & IFC Interoperability**
+- Actual IFC data structures, supported geometry, property sets, quantities, material metadata, and source provenance.
+- How imported IFC elements relate to native Plotify elements.
+- Whether usable quantities or material properties are available and which information is read-only.
+- Existing IFC regression tests.
+
+**P42 — CAD Drawing Exchange**
+- Actual CAD geometry representation, mapping behaviour, unit handling, and provenance.
+- Whether imported CAD records contain material information or only planar geometry.
+- How to avoid assuming that a drawing boundary or line represents a complete construction quantity.
+
+**P43 — Terrain & Topographic Site Modeling**
+- Actual site-elevation metadata, supported terrain representation, coordinate conventions, and storage limits.
+- Whether any reliable existing-ground or proposed-ground quantities are available.
+- Whether a proposed excavation quantity can actually be computed from supported data.
+
+Terrain elevations or CAD geometry must not be treated as sufficient evidence for carbon-intensive excavation quantities unless a valid quantity-calculation method and the required inputs exist.
+
+**Existing services and controls**
+- Any existing carbon calculations, their formulas, and known consumers.
+- Existing scenario, costing, reporting, storage, backup, and versioning services.
+- Existing project-update and validation patterns.
+- Installed libraries, license constraints, and build configuration.
+- Existing verification suites, testing conventions, TypeScript/lint commands, and production build.
+- Current report/documentation generation mechanisms.
+
+Identify the difference between directly observed data, derived quantities, assumptions, estimates, and unavailable information.
+
+After inspection, record the relevant existing files, planned changes, available source data, and technical limitations. Then implement the strongest reliable P44 capability that fits the actual architecture. Do not stop at an audit report unless a genuine technical blocker makes implementation unsafe.
+
+### 4. ASSESSMENT METHODOLOGY AND DECLARED SCOPE
+
+Design P44 around an explicit, versioned assessment methodology.
+
+Use authoritative lifecycle-assessment and building-carbon guidance where applicable. Relevant reference frameworks include:
+
+- RICS Whole Life Carbon Assessment for the Built Environment, 2nd edition, Version 3 issued in August 2024.
+- EN 15978 and EN 17472 where applicable to the asset type and chosen methodology.
+- ISO 14040 and ISO 14044 principles for life-cycle assessment.
+- Applicable environmental product declaration standards and the actual methodology declared by each source dataset.
+
+Verify the availability, version, applicability, and actual requirements of the references before describing the implemented assessment as aligned or compliant.
+
+Reference links for documentation:
+- RICS Whole Life Carbon Assessment: https://www.rics.org/profession-standards/rics-standards-and-guidance/sector-standards/construction-standards/whole-life-carbon-assessment
+- ISO 14040: https://www.iso.org/standard/37456.html
+
+Do not imply that referencing these documents automatically makes Plotify's calculations compliant with every requirement.
+
+Create a versioned Plotify assessment profile, such as `plotify-whole-life-carbon-p44-v1`, that records the implemented calculation rules and limitations.
+
+The profile must define:
+- Included lifecycle modules.
+- Declared measurement units.
+- Reference study period and its source.
+- Applicable asset type and methodology.
+- Material quantity rules.
+- Emission-factor source selection.
+- Treatment of biogenic carbon.
+- Operational energy and water assumptions.
+- Maintenance and replacement assumptions.
+- End-of-life treatment.
+- Treatment of potential benefits beyond the system boundary.
+- Calculation and rounding rules.
+- Known exclusions and deviations from the selected reference methodology.
+
+Where the selected standard requires a particular reference study period or reporting rule, apply it only to the appropriate assessment profile and asset context. Do not impose a universal building lifespan or methodology without an applicable basis.
+
+### 5. LIFECYCLE MODULES AND REPORTING BOUNDARIES
+
+Provide a clear, module-based lifecycle accounting system.
+
+Use the following structure where supported by the selected assessment profile:
+
+**A0 — Pre-construction, where applicable**
+
+Record relevant pre-construction impacts only when the selected methodology and available data justify their inclusion.
+
+Do not invent values for this module.
+
+**A1–A3 — Product stage**
+
+Assess the emissions associated with production of construction materials and products, including the applicable raw-material supply, transport into manufacturing, and manufacturing processes.
+
+Prefer valid product-specific Environmental Product Declarations (EPDs) where the declared product, quantity unit, geography, and lifecycle modules match the project requirements.
+
+**A4 — Transport to site**
+
+Calculate transport impacts from known or explicitly entered transport distances, transport modes, payload assumptions, and appropriate transport emission factors.
+
+Do not assume a universal distance from supplier to building site.
+
+**A5 — Construction and installation**
+
+Assess relevant construction-process emissions, installation energy, construction losses, and waste-treatment impacts where the chosen method and sufficient data are available.
+
+Do not invent detailed site fuel use or construction waste rates.
+
+**B1 — Use-related emissions from products**
+
+Include relevant emissions or removals during product use only when supported by suitable data and the selected method.
+
+**B2–B5 — Maintenance, repair, replacement, and refurbishment**
+
+Model foreseeable lifecycle events using explicit component lifetimes, maintenance assumptions, replacement quantities, and relevant emission factors.
+
+Show the reference period and timing assumptions. Do not assume every component needs replacement at a universal interval.
+
+**B6 — Operational energy**
+
+Assess operational-energy emissions only when annual energy demand or consumption data and applicable energy-carrier emission factors are available.
+
+Differentiate measured consumption from modelled demand and generic assumptions.
+
+**B7 — Operational water**
+
+Assess relevant water-related operational impacts only when the required water demand, treatment or supply factors, and applicable methodology are available.
+
+**B8 — Other user-related impacts, where applicable**
+
+Include this module only when relevant to the asset, scope, methodology, and available evidence.
+
+**C1–C4 — End of life**
+
+Assess applicable deconstruction or demolition, transport, waste processing, and disposal processes using documented assumptions and appropriate factors.
+
+**D — Beyond the system boundary**
+
+Report potential benefits and loads beyond the system boundary separately when the selected methodology and data support them.
+
+Do not silently subtract Module D from the A–C total. Display Module D separately and explain its assumptions, limitations, and relationship to reuse, recycling, recovered materials, or exported energy.
+
+A complete assessment must distinguish:
+- Upfront carbon.
+- Embodied carbon.
+- Operational carbon.
+- Whole-life carbon.
+- Module D benefits or loads, reported separately.
+- Unassessed or unsupported modules.
+
+Define each aggregate calculation precisely according to the selected methodology. Prevent double counting between modules and ensure that a metric is not given the wrong name merely because it has a similar numerical value.
+
+If the available data supports only A1–A3 screening, label it as an A1–A3 screening assessment—not a complete whole-life carbon assessment.
+
+### 6. CARBON DATA AND EMISSION-FACTOR REGISTRY
+
+Implement a traceable factor registry using the existing architecture or a small, backward-compatible extension.
+
+Each factor record should include relevant information such as:
+
+- Unique factor identifier.
+- Material, product, component, energy carrier, transport mode, or other applicable subject.
+- Source organisation and source reference.
+- EPD identifier or dataset record, where applicable.
+- Product or technology scope.
+- Applicable region or geography.
+- Publication date, validity information, and dataset version where available.
+- Declared or functional unit.
+- Factor value and unit.
+- Global warming potential metric and stated assessment method.
+- Lifecycle modules covered by the factor.
+- Biogenic-carbon reporting treatment, where relevant.
+- Verification or source-quality status.
+- Known exclusions, assumptions, and limitations.
+- Source access or licence information where applicable.
+
+Use a source-selection hierarchy such as:
+
+1. A valid product-specific EPD matching the actual product and declared units.
+2. A suitable manufacturer-specific or industry dataset with documented scope and provenance.
+3. An applicable regional or national database with documented methodology.
+4. A traceable generic factor from an appropriate authoritative source.
+5. A user-entered scenario factor with explicit source and confirmation status.
+
+The hierarchy must not override compatibility. A high-specificity factor is not suitable if its declared unit or system boundary is incompatible with the requested calculation.
+
+Where no suitable verified factor exists, return **Unavailable** or identify a clearly labelled, explicitly selected scenario assumption. Never manufacture an EPD, emission factor, source citation, or database record.
+
+Do not introduce an external API, paid subscription, or downloaded dataset without reviewing its availability, licensing, compatibility, maintenance, and cost implications.
+
+### 7. FACTOR IMPORT AND VALIDATION
+
+If factor import is implemented, provide a documented format such as CSV or JSON using explicitly mapped fields.
+
+Validate:
+- Required columns and values.
+- Numeric values and sign conventions.
+- Declared units.
+- Module identifiers.
+- Dataset and factor identifiers.
+- Source and methodology metadata.
+- Duplicate records.
+- Incompatible or conflicting factors.
+- Invalid, non-finite, or implausible values.
+
+Reject or quarantine malformed records instead of silently correcting them.
+
+Do not permit a factor expressed per kilogram of product to be used as though it were per square metre or cubic metre without a valid and documented conversion requiring known material properties.
+
+Imported factors must be distinguishable from validated external records. A user-imported value must not receive a verified-source label merely because it passed file validation.
+
+Allow review and explicit confirmation before imported factor data affects a saved assessment.
+
+### 8. QUANTITY TAKE-OFF AND MATERIAL INVENTORY
+
+Create a transparent material-quantity inventory.
+
+Use actual geometry, BIM quantities, or explicitly entered quantities only where the implementation supports them.
+
+For each quantity, record:
+- Element or material identifier.
+- Associated project component, where known.
+- Quantity value and unit.
+- Quantity source.
+- Measurement or calculation method.
+- Associated material or product factor.
+- Quantity-data provenance.
+- Assumptions and confidence limitations.
+- Whether the quantity was measured, model-derived, estimated, or user-entered.
+
+Potential supported quantities include:
+- Material mass.
+- Material volume.
+- Surface area.
+- Element counts.
+- Component lengths.
+- Explicitly declared product quantities.
+
+Use consistent unit conversions and document the rules.
+
+Do not assume that all room area is the same as gross floor area, that all walls have a known thickness, or that geometric dimensions establish a complete bill of materials.
+
+If element dimensions or material assignments are insufficient, report the quantity as unavailable or allow the user to enter it explicitly.
+
+Avoid double counting the same element through imported BIM data and native project geometry.
+
+Where P41 provides a usable quantity or material property through its actual supported interface, reuse it rather than writing another IFC parser.
+
+Where P42 provides only 2D geometry without material properties or elevation information, do not treat it as a complete material take-off.
+
+Where P43 provides terrain information, do not infer excavation or earthwork carbon without a supported calculation method, defined boundaries, and the necessary existing-ground and proposed-ground data.
+
+### 9. MATERIAL ASSEMBLIES AND LIFECYCLE EVENT CALCULATIONS
+
+Implement calculations through small, typed, deterministic, independently testable functions.
+
+At a basic level, a supported material calculation may follow:
+
+`Material impact = Valid quantity × Compatible emission factor`
+
+Every such calculation must first normalize compatible units and lifecycle boundaries.
+
+For unit conversions:
+- Validate source and target units.
+- Apply a documented conversion factor.
+- Preserve sufficient precision through intermediate calculations.
+- Round only at presentation boundaries unless the methodology requires a particular rounding rule.
+- Reject or flag conversions that require unavailable material properties.
+
+For component replacement:
+- Define the reference study period.
+- Identify the component's supported service-life assumption.
+- Calculate the number and timing of applicable replacements under the selected method.
+- Include relevant replacement quantities and impacts without duplicating the initial installation.
+- Explain uncertainty when service life is generic or user-entered.
+
+For construction waste and end of life:
+- Follow the factor's declared boundary and the selected methodology.
+- Avoid counting the same transport, waste, or processing impact in multiple stages.
+- Separate recorded data from generic scenario assumptions.
+
+Create explicit calculation traces so a user can inspect how each major result was produced.
+
+### 10. OPERATIONAL ENERGY AND WHOLE-LIFE SCENARIOS
+
+Include operational carbon only when supported by credible operational-energy information.
+
+Potential inputs include:
+- Annual electricity demand or consumption.
+- Annual fuel consumption by carrier.
+- Heating and cooling demand, if available.
+- Relevant energy-system efficiency assumptions.
+- Geographic grid or energy-carrier emission factors.
+- Factor reference year.
+- Applicable reference study period.
+- Any explicitly selected future energy-factor scenario.
+
+For each input, label its source and status, such as measured, modelled, user-entered, or generic assumption.
+
+If a future decarbonisation scenario is offered, let users inspect the scenario's factor assumptions and time series. Do not invent a predicted grid trajectory or describe an illustrative scenario as a guaranteed future outcome.
+
+Operational emissions must not automatically be calculated from building area alone unless a clearly documented screening method exists and the result is labelled as an estimate with the necessary assumptions.
+
+When energy data is missing, display operational carbon as unavailable rather than zero.
+
+Do not silently treat a lack of operational-energy data as evidence that a building has no operational emissions.
+
+### 11. BIOGENIC CARBON AND MODULE-D ACCOUNTING
+
+Handle biogenic carbon and potential recovery benefits conservatively.
+
+Requirements:
+- Preserve the treatment declared by the source dataset or EPD.
+- Distinguish stored biogenic carbon from emissions and removals across lifecycle stages.
+- Do not assume that timber or other bio-based products automatically produce a net-negative lifecycle impact.
+- Do not double count biogenic carbon in the product-stage factor and a separate stored-carbon calculation.
+- Record the treatment of biogenic carbon in the selected assessment profile.
+- Include end-of-life emissions or removals where relevant and supported.
+- Report potential reuse or recycling benefits in Module D only when the method and data justify them.
+- Do not assume that all materials will be recycled or reused.
+- Do not subtract hypothetical future benefits from the A–C result without explicit, separately reported justification.
+
+### 12. ASSESSMENT ENGINE AND RESULT DATA MODEL
+
+Inspect existing types and services before introducing new contracts.
+
+A minimal P44 domain model may include concepts such as:
+
+- `CarbonAssessmentProfile`
+- `CarbonFactorRecord`
+- `CarbonMaterialInventoryItem`
+- `CarbonQuantityEvidence`
+- `CarbonCalculationTrace`
+- `CarbonLifecycleModuleResult`
+- `CarbonDataQualitySummary`
+- `CarbonScenarioAssumption`
+- `WholeLifeCarbonAssessment`
+- `ProjectCarbonAssessmentMetadata`
+
+These are conceptual names, not a requirement to create every type exactly as written. Follow actual repository conventions and introduce only necessary contracts.
+
+Every important result should retain enough information to identify:
+- Assessment profile and version.
+- Lifecycle module.
+- Source quantities and units.
+- Emission factors and compatible units.
+- Source references.
+- Calculation formula and trace.
+- Included assumptions and exclusions.
+- Data-quality and completeness status.
+- Date or version of relevant factor datasets where available.
+
+Keep carbon-assessment metadata separate from `ifcInterop`, `cadInterop`, `terrainModeling`, and other existing project domains.
+
+Use optional, backward-compatible project metadata when required. Do not create a duplicate project model or independent persistence engine.
+
+### 13. RESULTS WORKSPACE AND VISUALIZATION
+
+Implement a clear carbon-assessment workspace that fits the existing Plotify UI.
+
+Suggested stages:
+
+1. **Assessment Scope:** Select the asset, methodology profile, reference period, and reporting units.
+2. **Inventory & Sources:** Inspect material quantities, source records, factors, and missing inputs.
+3. **Calculate & Validate:** Run deterministic calculations and display validation warnings.
+4. **Lifecycle Breakdown:** Explore results by lifecycle module, element, material, and source.
+5. **Hotspots & Scenarios:** Identify the largest supported contributors and compare explicit assumptions.
+6. **Report & Provenance:** Review the complete calculation record, exclusions, confidence, and limitations.
+
+Possible result views include:
+- Upfront carbon summary.
+- Embodied-carbon breakdown.
+- Operational-carbon breakdown, when supported.
+- Whole-life A–C total.
+- Module D results reported separately.
+- Carbon per square metre, only where the floor-area basis is defined and comparable.
+- Contributions by material or component.
+- Missing-data and data-quality indicators.
+- Scenario comparison with clearly stated assumptions.
+
+Do not allow a chart, summary card, or green/red badge to hide missing data, excluded modules, or incompatible factors.
+
+Do not assign an overall environmental grade or universal green score without a defined, credible, applicable benchmark.
+
+### 14. DATA COMPLETENESS, UNCERTAINTY, AND CLAIM CONTROL
+
+Build an explicit data-quality and completeness system.
+
+Distinguish among:
+- Measured or directly documented project data.
+- Product-specific verified-source information.
+- Generic database factors.
+- Model-derived quantities.
+- User-entered values.
+- Scenario assumptions.
+- Unavailable or unsupported information.
+
+Where feasible, report:
+- Percentage or share of relevant quantities with usable factors.
+- Quantity coverage and data-quality categories.
+- Unassessed lifecycle modules.
+- Important sources of uncertainty.
+- Sensitivity to major user-entered assumptions.
+
+Do not fabricate statistical confidence intervals when no defensible uncertainty model exists.
+
+If a simplified uncertainty range is calculated, document the source of its range, calculation method, assumptions, and limitations.
+
+An assessment should be labelled appropriately as one of:
+- **Preliminary screening estimate**
+- **Partially assessed lifecycle**
+- **Whole-life assessment within a documented scope**
+- **Not assessable with current data**
+
+Only use a whole-life assessment status when the necessary lifecycle scope has genuinely been evaluated under the selected method, including explicitly justified exclusions or non-applicable modules.
+
+A passed software test is not proof that the project's carbon assessment is accurate or professionally certified.
+
+### 15. CARBON-REDUCTION OPPORTUNITIES
+
+Provide explainable decision support where the underlying data allows it.
+
+Potential opportunities may include:
+- Alternative material factors.
+- Reduced material quantities where an actual quantity can be modified and validated.
+- Product replacement or service-life scenarios.
+- Transport or construction-process alternatives.
+- Operational-energy scenarios with explicit assumptions.
+- Reuse or recycling options where their relevant data is available.
+
+Each suggested opportunity must:
+- State the baseline and proposed scenario.
+- Identify the changed input.
+- Show the calculation and relevant lifecycle modules.
+- Explain the effect on the result.
+- Identify assumptions and unavailable evidence.
+- Avoid claiming a reduction when the calculation cannot substantiate it.
+
+Do not claim that one material is universally greener based on a single factor without considering quantity, functional equivalence, lifecycle boundary, service life, and other relevant assumptions.
+
+Do not silently modify the saved building design, material specifications, energy model, or project configuration when users explore alternatives.
+
+Keep proposed changes in a scenario or preview until the user explicitly confirms an actual supported change.
+
+P44 must not implement P46 Building Envelope Performance Analyzer or other future roadmap features in order to generate unsupported energy or material-performance results.
+
+### 16. P41, P42, AND P43 COEXISTENCE
+
+P44 must complement the existing Account B features.
+
+**P41 — OpenBIM & IFC Interoperability**
+- Reuse actual available material properties and quantities through verified contracts.
+- Distinguish read-only IFC provenance metadata from real editable element quantities.
+- Do not rewrite the IFC parser or exporter.
+- Verify that P44 changes preserve IFC provenance and existing supported import/export workflows.
+
+**P42 — CAD Drawing Exchange**
+- Use only geometry and metadata that the actual CAD implementation exposes.
+- Do not infer detailed material quantities from 2D linework alone.
+- Keep the CAD parser/exporter unchanged unless a necessary compatibility change is justified and tested.
+- Verify that P44 operations do not damage CAD provenance.
+
+**P43 — Terrain & Topographic Site Modeling**
+- Use only actual terrain or site information supported by its current implementation.
+- Do not infer excavation carbon, transportation distances, or civil-engineering quantities without the required inputs and a valid calculation method.
+- Preserve `terrainModeling` data, raw-source provenance, and existing visualization behaviour.
+
+Before using any P41–P43 interface, inspect its actual definitions. Do not duplicate a service or fabricate integration merely to claim compatibility.
+
+Create regression tests for any relevant existing functionality affected by P44 changes.
+
+### 17. FUTURE ROADMAP BOUNDARIES: P45–P50
+
+Keep P44 limited to embodied and whole-life carbon assessment.
+
+- **P45 — Climate Hazard & Resilience Analyzer:** Do not implement hazard modelling or resilience scoring.
+- **P46 — Building Envelope Performance Analyzer:** Do not implement the dedicated envelope performance engine. P44 may consume existing reliable energy results through an actual supported interface.
+- **P47 — Construction Site Logistics Planner:** Do not implement construction logistics planning.
+- **P48 — Augmented Reality Site Visualization:** Do not implement AR functionality.
+- **P49 — Immersive VR Design Review:** Do not implement a VR workspace.
+- **P50 — Live Multi-User Design Collaboration:** Do not implement collaboration or synchronization features.
+
+Document future extension points without prematurely implementing these systems.
+
+### 18. DATA STORAGE, SECURITY, AND SAFE PROJECT UPDATES
+
+Inspect the current project persistence limits and safe-update mechanisms before modifying the project model.
+
+Requirements:
+- Store only the necessary assessment metadata and supported inventory data.
+- Avoid duplicating large imported datasets unnecessarily.
+- Follow existing storage constraints.
+- Validate source files and imported factor records.
+- Handle malformed, oversized, or incompatible data safely.
+- Keep assessment snapshots and project state consistent.
+- Use the existing versioning/checkpoint service when needed.
+- Preserve existing project identifiers and unrelated fields.
+- Make assessment saves atomic where supported.
+- Ensure a failed assessment update cannot leave inconsistent project state.
+- Do not overwrite IFC, CAD, or terrain metadata.
+- Do not expose secret keys or sensitive configuration in browser code.
+- Do not introduce a second competing persistence system.
+
+If a large inventory or factor dataset cannot be stored safely in the current architecture, use a documented size limit and clear user-facing error instead of silently truncating records.
+
+### 19. PERFORMANCE AND FAILURE HANDLING
+
+- Keep factor lookup, unit conversion, and carbon calculations deterministic.
+- Avoid expensive full-project recalculations when only one relevant value changes.
+- Validate quantities and factors before calculation.
+- Handle missing values, invalid units, incompatible modules, and overflow.
+- Guard against duplicate requests or stale asynchronous responses.
+- Provide clear loading, empty, partial-data, unavailable, warning, and failure states.
+- Prevent unbounded scenario expansion or oversized imports from freezing the UI.
+- Do not turn failed source lookups into fabricated default factors.
+- Do not silently substitute one emission factor for another.
+- Clearly distinguish a calculation failure from a result of zero emissions.
+
+### 20. TESTING AND REGRESSION
+
+Create a dedicated P44 test suite and register it in the actual system verification runner using the repository's established conventions.
+
+Test at least the applicable cases below.
+
+**A. Factor registry**
+- Valid, invalid, duplicate, and missing factor records.
+- Provenance retention.
+- Product-specific versus generic factor labelling.
+- Units and declared-unit compatibility.
+- Lifecycle module coverage.
+- Source and version metadata.
+- Unknown or unverified factor handling.
+
+**B. Quantity and unit calculations**
+- Known material quantities with known expected factors.
+- Mass, area, volume, length, and count conversions where implemented.
+- Invalid quantities and non-finite values.
+- Unsupported conversions without required material properties.
+- Preventing duplicate quantity take-off.
+- Preservation of intermediate calculation precision.
+
+**C. Lifecycle accounting**
+- A1–A3 calculations.
+- A4 transport with explicit distance and transport factors.
+- A5 construction/waste assumptions.
+- Maintenance, repair, replacement, and refurbishment.
+- Operational energy and water where supported.
+- End-of-life modules C1–C4.
+- Module D separately reported.
+- Correct aggregation of whole-life A–C results.
+- No hidden subtraction of Module D benefits.
+- No double counting across modules.
+- Explicit unavailable states for missing evidence.
+
+**D. Biogenic carbon and uncertainty**
+- Compatible EPD methodology and reporting boundaries.
+- Biogenic carbon treatment and no double counting.
+- Missing service life or energy data.
+- User-entered scenarios and source provenance.
+- Data completeness and unassessed modules.
+- Sensitivity to changed assumptions where implemented.
+
+**E. P41–P43 regression**
+- Existing IFC import/export behaviour.
+- Existing CAD import/export behaviour.
+- Existing terrain model and 3D overlay.
+- Preservation of unrelated project fields.
+- Correct handling of existing project records with no P44 metadata.
+
+**F. System-wide verification**
+- Run the new P44 tests.
+- Run relevant existing regression tests that actually exist in the current repository.
+- Inspect the true verification runner and run the full suite.
+- Run actual TypeScript/lint checks.
+- Run the production build.
+
+Report exact commands, actual outcomes, failures, and actual suite counts. Do not assume a fixed count from prior reports. Do not remove or weaken existing tests to get a passing result. Synthetic tests alone do not prove that every real-world EPD or whole-life assessment is accurate.
+
+### 21. DOCUMENTATION
+
+Create a technical document following the existing repository convention, such as:
+
+`docs/P44_EMBODIED_WHOLE_LIFE_CARBON_ASSESSMENT_SPECIFICATION.md`
+
+Document:
+- Actual pre-implementation findings.
+- Selected methodology and version.
+- Supported lifecycle modules.
+- Factor registry and source hierarchy.
+- Material-quantity sources and conversions.
+- Assessment formulas and calculation traces.
+- Biogenic-carbon treatment.
+- Operational energy and water requirements.
+- Reference study period and replacement assumptions.
+- Module D reporting boundaries.
+- Missing-data and uncertainty behaviour.
+- P41/P42/P43 interfaces actually used.
+- Project persistence and safe-update behaviour.
+- Supported exports and limitations.
+- Tests executed and actual results.
+- Known defects, exclusions, and remaining risks.
+- Future integration requirements and P45–P50 boundaries.
+
+Do not write planned functionality or aspirational compliance as completed capability.
+
+### 22. ACCEPTANCE CRITERIA
+
+P44 is ready for review only when:
+
+1. The actual codebase and relevant P41–P43 interfaces have been inspected.
+2. The supported assessment scope and methodology profile are documented.
+3. Every used emission factor has traceable provenance and compatible units.
+4. Material quantities are measured, derived, or explicitly estimated with a clear method.
+5. Missing data is never silently presented as zero emissions.
+6. Lifecycle modules have explicit boundaries and are aggregated without double counting.
+7. Module D is reported separately from A–C totals.
+8. Operational carbon is calculated only from supported demand/consumption data and applicable factors.
+9. Biogenic carbon and replacement assumptions are handled transparently.
+10. Results expose their calculations, sources, assumptions, and exclusions.
+11. P41–P43 functions remain intact.
+12. Data storage and project updates preserve unrelated project state.
+13. P44 tests and relevant existing regression suites have been executed.
+14. TypeScript/lint and production-build outcomes are reported accurately.
+15. Known limitations and integration risks have been documented.
+16. P45–P50 have not been implemented.
+17. No GitHub operation or cross-account integration has been performed.
+18. P44 is not marked Verified, Approved, or Complete unless the relevant checks genuinely passed.
+
+### 23. REQUIRED FINAL IMPLEMENTATION REPORT
+
+Provide a complete report with:
+
+1. **Initial inspection:** What the actual Account B codebase contained.
+2. **Files:** Exact paths created and modified.
+3. **Methodology:** Selected carbon-assessment profile and applicable references.
+4. **Factor registry:** Sources, versions, declared units, lifecycle scope, and licensing considerations.
+5. **Quantity inventory:** Actual quantity sources, derivations, and limitations.
+6. **Calculation engine:** Implemented formulas, unit conversions, and lifecycle module handling.
+7. **Assessment output:** Which metrics and lifecycle modules are actually supported.
+8. **Operational carbon:** Required inputs and actual implemented behaviour.
+9. **Biogenic carbon and Module D:** Treatment and reporting boundaries.
+10. **Data quality:** Completeness, missing information, uncertainty, and result-status labels.
+11. **P41–P43 coexistence:** Interfaces reused and regression outcomes.
+12. **Data integrity:** Persistence, snapshots, rollback, and compatibility.
+13. **Tests:** Exact commands, observed outputs, actual suite counts, and failures.
+14. **Build results:** Actual lint/typecheck and production-build outcomes.
+15. **Known limitations:** Unsupported modules, missing datasets, defects, and workarounds.
+16. **Future integration:** Shared-file changes, dependencies, and interface risks.
+17. **Scope confirmation:** Confirm P45–P50, GitHub operations, and cross-account integration were not performed.
+18. **Status:** Which acceptance criteria passed, failed, or remain unverified.
+
+**Final priority: traceable carbon factors, valid lifecycle boundaries, accurate quantity accounting, no fabricated data, reproducible calculations, and safe future integration readiness. Quality and transparency are more important than producing a large carbon number or a visually impressive score.**

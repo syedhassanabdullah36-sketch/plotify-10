@@ -1,0 +1,948 @@
+# P49 — IMMERSIVE VR DESIGN REVIEW
+## End-to-End Implementation Specification — Plotify Account B
+
+**Roadmap ID:** P49  
+**Feature:** Immersive VR Design Review  
+**Product:** Plotify — Architecture Intelligence Platform  
+**Implementation mode:** Inspect → Plan → Implement → Verify → Report  
+**Primary objective:** Enable users to inspect existing Plotify architectural models in an immersive virtual-reality environment, explore spatial relationships at meaningful scales, identify and annotate design issues, and preserve review state safely.
+
+---
+
+# 1. MISSION AND EXPECTED USER OUTCOME
+
+Implement P49 as a complete, coherent VR design-review workspace integrated into the existing Plotify application.
+
+The goal is to help users understand a design in three dimensions in ways that may be difficult through a flat screen: room proportions, circulation, spatial relationships, building form, terrain context, and the location of potential design concerns.
+
+P49 must deliver more than a VR launch button. It should provide a usable workflow from project selection to immersive inspection, navigation, issue marking, saved review notes, exit, and follow-up inspection.
+
+The user should be able to:
+
+1. Select a valid Plotify project and reviewable design.
+2. inspect the available 3D model and understand its geometry, units, limitations, and source information.
+3. Enter an immersive VR session when the device, browser, security context, and runtime support it.
+4. Explore a building at a clearly labelled full-scale or model-scale setting where supported by model data.
+5. Navigate with VR controllers or another genuinely supported interaction method.
+6. Switch between useful architectural review layers without losing context.
+7. Mark a design location, create a review note, and inspect the note later.
+8. Identify stale or unavailable analysis data.
+9. Exit VR safely and return to a usable standard 3D review.
+10. Preserve saved review information across appropriate project reloads.
+
+The feature must distinguish an immersive visual review from a certified survey, a construction set-out tool, a code-compliance engine, or a validated structural, environmental, or building-performance simulation.
+
+## Success principle
+
+Make the model easier to understand, the review easier to perform, and the limitations easier to see. Do not fabricate measurements, model detail, physical-world alignment, or engineering certainty to make the VR experience look more impressive.
+
+# 2. LOCKED ROADMAP SCOPE
+
+Implement **P49 only**.
+
+Account B roadmap boundaries:
+
+- P41 — OpenBIM & IFC Interoperability.
+- P42 — CAD Drawing Exchange.
+- P43 — Terrain & Topographic Site Modeling.
+- P44 — Embodied & Whole-Life Carbon Assessment.
+- P45 — Climate Hazard & Resilience Analyzer.
+- P46 — Building Envelope Performance Analyzer.
+- P47 — Construction Site Logistics Planner.
+- P48 — Augmented Reality Site Visualization.
+- P49 — Immersive VR Design Review — implement now.
+- P50 — Live Multi-User Design Collaboration — future scope.
+
+P49 may read relevant data from P41–P48 using existing, verified contracts. It must not redesign these features, modify their authoritative calculations, or create replacement versions of their engines.
+
+**P50 is strictly out of scope.** Do not implement realtime multi-user sessions, shared cursors, live co-presence, synchronized avatars, collaborative locking, realtime conflict resolution, cloud collaboration infrastructure, or websocket-based collaboration for P49.
+
+P49 may save ordinary project-scoped review notes and annotations using existing persistence conventions. This is not permission to build P39-style decision history or P50-style live collaboration.
+
+Do not merge Account A and Account B. Do not connect or modify GitHub repositories, modify another account, provision cloud services, or undertake unrelated deployment or infrastructure changes.
+
+# 3. AUDIT THE EXISTING CODEBASE BEFORE EDITING
+
+Inspect the actual Account B codebase first.
+
+Read the relevant type definitions, service functions, components, tests, navigation, persistence logic, geometry builder, snapshot/version service, and existing P48 implementation.
+
+Do not rely exclusively on previous implementation reports. Check the actual current code and exports.
+
+At minimum, inspect:
+
+- `src/types/project.ts`
+- `src/components/viewer3d/building3dGeometry.ts`
+- `src/types/arSiteVisualization.ts`
+- `src/services/arSiteVisualizationService.ts`
+- `src/components/ar/ARSiteVisualizationWorkspace.tsx`
+- The current 3D viewer and renderer lifecycle.
+- Existing 3D canvas, navigation, project overview, sidebar, and application-routing components.
+- Project versioning and snapshot/rollback utilities.
+- P41 IFC types and services.
+- P42 CAD exchange types and services.
+- P43 terrain geometry, units, coordinate reference assumptions, and surface mesh.
+- P44 whole-life carbon assessment types and summaries.
+- P45 climate-resilience assessment types and source metadata.
+- P46 envelope-performance types and assessment freshness.
+- P47 site-logistics types, plan versions, zones, and equipment overlays.
+- `scripts/run_all_verifications.ts` and the current test conventions.
+
+Determine how the current P48 model builder works, how it manages renderer and scene resources, and whether it can be reused safely for P49.
+
+Inspect the actual project coordinate convention. The previous P48 report describes:
+
+- X: east across plot width.
+- Y: vertical/up.
+- Z: south across plot length.
+- Internal normalized geometry expressed in metres where the relevant builder requires it.
+
+Verify these conventions in the current code rather than blindly assuming the report is still accurate.
+
+Create a concise internal implementation plan and an exact file-change inventory before editing. Then proceed with the scoped implementation without waiting for additional approval.
+
+If a required input or service does not exist, support an explicit unavailable or incomplete-data state. Do not invent a dependency, geometry field, measurement, or source record.
+
+# 4. RECOMMENDED ARCHITECTURE
+
+Follow established project conventions. Use dedicated P49 domain types, services, workspace components, and tests where consistent with the current application structure.
+
+Possible separation of responsibilities:
+
+- VR review types and state transitions.
+- Review-model preparation and validation.
+- WebXR capability diagnostics.
+- Renderer and immersive-session lifecycle.
+- Navigation and controller input.
+- Review annotations and bookmarks.
+- Read-only cross-discipline overlays.
+- Project persistence, fingerprints, and restoration.
+- P49 workspace and user-facing review tools.
+- Dedicated tests, documentation, and verification registration.
+
+The final filenames should follow the actual project conventions and be documented in the implementation report.
+
+Keep rendering and interaction concerns separate from review-data persistence. Keep model preprocessing and geometry validation separate from React presentation where practical.
+
+Use typed structures and testable functions. Do not build an excessively large monolithic workspace containing every calculation, controller handler, persistence operation, and rendering routine.
+
+Do not install a major XR framework simply because it offers more features. First determine what the existing Three.js renderer can support. Introduce a dependency only when it is necessary, compatible with the project, appropriately licensed, and justified by the implemented use case.
+
+# 5. VR CAPABILITY DETECTION AND SESSION PREPARATION
+
+The workspace must distinguish genuine immersive VR from non-immersive 3D review.
+
+Use runtime capability detection. Do not infer VR support from user-agent strings, device labels, desktop width, mobile status, or the mere presence of Three.js.
+
+Where supported by the existing runtime, inspect:
+
+- Secure-context availability.
+- Presence of `navigator.xr`.
+- Result of `navigator.xr.isSessionSupported('immersive-vr')`.
+- WebGL renderer readiness.
+- Browser focus and document visibility.
+- Permission-Policy restrictions relevant to XR spatial tracking.
+- Actual available reference spaces and input sources.
+- Renderer or headset session conflicts.
+- Model validity and scene-preparation status.
+
+WebXR documentation:
+- API overview: https://developer.mozilla.org/en-US/docs/Web/API/WebXR_Device_API
+- Permissions and security: https://developer.mozilla.org/en-US/docs/Web/API/WebXR_Device_API/Permissions_and_security
+- Session startup and shutdown: https://developer.mozilla.org/en-US/docs/Web/API/WebXR_Device_API/Startup_and_shutdown
+- Application lifecycle: https://developer.mozilla.org/en-US/docs/Web/API/WebXR_Device_API/Lifecycle
+
+Do not claim that a successful capability check guarantees that the headset will start, that controllers will be available, or that a large model will run smoothly.
+
+Use clearly defined workspace modes.
+
+## Mode A — Immersive VR Review
+
+Enter this mode only when actual immersive VR session support has been confirmed and session startup succeeds.
+
+Display the available navigation methods and controls based on the actual detected input sources. Do not advertise hand tracking, eye tracking, controller haptics, or advanced headset features unless they are genuinely supported and implemented.
+
+## Mode B — Standard 3D Design Review
+
+Provide a functional non-immersive Three.js review when the browser or device cannot start immersive VR.
+
+Support appropriate orbit, pan, zoom, camera presets, model inspection, layer filtering, and available annotation actions.
+
+The fallback must not depend on successfully starting an XR session.
+
+## Mode C — Review Setup and Calibration
+
+Provide a non-immersive workspace for checking model scale, orientation, review visibility, navigation settings, and annotation settings before entering VR.
+
+This mode must never be labelled an immersive VR session.
+
+If VR is unsupported, the UI should remain useful and explain why immersive entry is unavailable.
+
+# 6. SAFE SESSION START, LIFECYCLE, AND EXIT
+
+Follow the current WebXR and Three.js lifecycle patterns.
+
+Use the actual renderer's XR manager where appropriate. In Three.js, inspect the current APIs and versions before implementation; `WebXRManager` documentation is available at:
+
+https://threejs.org/docs/pages/WebXRManager.html
+
+Requirements:
+
+1. Start an immersive session only in response to an intentional user action.
+2. Confirm the current document and runtime can support the request.
+3. Handle rejected session requests without crashing the workspace.
+4. Detect session start, visibility change, end, and unexpected interruption.
+5. Restore the standard 3D renderer state when the session ends.
+6. Remove event listeners and dispose of temporary XR resources.
+7. Avoid duplicate sessions or competing render loops.
+8. Ensure an interrupted session does not leave the application stuck in a misleading “VR active” state.
+9. Provide a clear exit action outside as well as within the appropriate available control flow.
+10. Dispose of session-specific resources without accidentally destroying shared project data or an active renderer still used by the standard viewer.
+
+Handle browser navigation, component unmount, application errors, headset disconnection, and runtime-initiated session termination.
+
+Never claim a session has started until the session-start outcome actually confirms it.
+
+Do not automatically request microphone, camera, eye-tracking, or environmental permissions unrelated to the VR review.
+
+# 7. MODEL PREPARATION, SCALE, AND COORDINATE INTEGRITY
+
+Use the existing building and site geometry pipeline wherever compatible.
+
+Reuse the real current implementation of `building3dGeometry.ts` and P48's scene/model preparation logic rather than creating parallel implementations of rooms, walls, slabs, roof geometry, terrain, and structural components.
+
+Before displaying a model in VR, validate:
+
+- The project and scene contain supported geometry.
+- Dimensions and units are understood.
+- Required coordinates and transforms are finite.
+- The expected vertical axis and orientation are correct.
+- Geometry contains no unsupported or malformed data that would break the viewer.
+- The model fits within the current rendering and interaction budget.
+- Any unsupported elements are disclosed.
+
+## 7.1 Scale modes
+
+Provide explicit, clearly labelled review scales where supported by the current model data, for example:
+
+- 1:1 — full-scale walkthrough.
+- 1:10 — reduced model review.
+- 1:20 — studio model.
+- 1:50 or 1:100 — compact whole-project review.
+
+Do not offer scales that create an incoherent or unusable review mode for the current model.
+
+Clearly state whether scale is derived from validated geometry or from a user-configured preview transform.
+
+Use one well-defined transformation path. Do not apply the same unit conversion or scale multiplier twice.
+
+Verify metre/foot conversion and orientation with known test fixtures. Preserve the existing coordinate contract.
+
+If the model requires a scale correction because its source units are unknown, ask for an explicit configuration within the UI rather than silently guessing.
+
+## 7.2 Full-scale navigation
+
+In a supported full-scale room walkthrough, the viewer's tracked head and controller positions must drive the virtual perspective according to the XR runtime.
+
+Do not overwrite the tracked XR camera transform with the ordinary desktop camera on every render.
+
+Keep scene placement, floor height, virtual origin, and user height assumptions distinct from any claim of surveyed physical placement.
+
+If the reference space or floor-level assumptions differ across runtimes, expose the applicable calibration or fallback and document its limitation.
+
+P49 is a virtual scene review. It does not inherit geospatial registration from P48, and it must not claim that a VR model is aligned with a real property, GNSS coordinate, surveyed site, or construction setting-out grid unless actual validated registration exists.
+
+# 8. VR NAVIGATION AND COMFORT
+
+Implement the navigation modes that can be supported reliably by the actual runtime.
+
+Prefer comfort-oriented options over unnecessary realism.
+
+## Required interaction options
+
+Where supported:
+
+- Controller-directed selection and pointing.
+- Controller ray interaction with reviewable objects.
+- Direct selection or gaze selection only when the runtime exposes an appropriate input method.
+- Teleportation to valid navigation destinations.
+- Snap turning.
+- Seated or stationary review.
+- Enter/exit control accessible without walking to a distant virtual button.
+- Return-to-origin or recenter controls where the runtime supports the intended behaviour.
+- A clear distinction between physical headset movement and virtual locomotion.
+
+Do not assume every headset has both controllers or identical buttons. Inspect `XRInputSource` information and adapt the interaction UI to the actual input devices.
+
+Reference:
+https://developer.mozilla.org/en-US/docs/Web/API/WebXR_Device_API/Inputs
+
+## Locomotion requirements
+
+1. Offer teleportation or another well-tested low-motion alternative wherever supported.
+2. Provide configurable snap-turn increments where practical.
+3. Do not force continuous artificial acceleration as the only navigation method.
+4. Avoid unnecessary camera bob, automatic movement, rapid scripted camera transitions, and sudden scene jumps.
+5. Keep the user informed before switching scale, origin, or review mode.
+6. Provide an immediate exit path.
+7. Do not move the virtual view unexpectedly when toggling an ordinary overlay.
+8. Prevent teleport destinations from being placed inside invalid model geometry where a supported collision or floor query can detect this.
+9. If a valid floor or walkable area cannot be established, do not imply that teleport destinations are physically validated.
+10. Include seated and stationary interaction paths that do not assume the user can physically walk through a room.
+
+Provide brief, non-alarming comfort guidance. Do not present a comfort preset as a guarantee that motion discomfort cannot occur.
+
+Do not bypass or disable the headset's own boundary or guardian system.
+
+# 9. ARCHITECTURAL EXPLORATION WORKFLOW
+
+Build a review experience rather than merely dropping the current scene into a headset.
+
+Provide useful navigation and inspection actions, depending on actual model completeness:
+
+- Enter a room or space.
+- Return to a whole-building overview.
+- Inspect a floor or selected area.
+- Inspect available facade, roof, structural, or site components.
+- Move between supported floor levels.
+- Hide or show selected review layers.
+- Focus or isolate a supported component.
+- Return to the default review viewpoint.
+- Inspect a selected element's available metadata.
+- Compare the selected review area with its source model data.
+- Open the issue/annotation panel.
+
+Do not generate fake rooms, doors, windows, materials, or building components to create an impression of a complete model.
+
+If the model is missing a roof, upper floor, opening, interior finish, or other element, represent the missing data accurately.
+
+If a layer is a semantic visualization only, clearly distinguish it from a separately modelled physical component.
+
+Avoid overwhelming the user with all site, engineering, carbon, hazard, and annotation layers enabled by default.
+
+Use a clear visual hierarchy. The base model should remain legible, and the user should be able to identify which discipline or source produced an overlay.
+
+# 10. CONTROLLER INTERACTIONS AND SPATIAL SELECTION
+
+Create a predictable interaction system.
+
+Where controller ray selection is supported:
+
+1. Show a visible pointer or targeting indicator.
+2. Determine which supported object, surface, or annotation is targeted.
+3. Display a clear selected-state indicator.
+4. Open relevant inspection information.
+5. Permit supported annotation creation or editing.
+6. Provide a clear way to cancel or return to navigation.
+7. Prevent one trigger action from accidentally performing multiple unrelated operations.
+8. Distinguish selection from an action that changes the project.
+
+Do not let selecting a model component automatically edit the underlying project.
+
+Do not confuse controller-ray intersections against the virtual scene with hit testing against the real physical environment. P48's AR placement and P49's virtual object selection are different operations.
+
+If controller input is missing, expose an honest explanation and use another implemented interaction method only if the runtime supplies it.
+
+If no usable interaction method is available, keep the standard 3D fallback accessible.
+
+# 11. REVIEW ANNOTATIONS, ISSUE MARKERS, AND BOOKMARKS
+
+P49 should help users record what they noticed while inspecting a design.
+
+Implement a compact, useful review record with fields or equivalent concepts such as:
+
+- Annotation ID.
+- Project ID.
+- Review-session ID.
+- Target element ID, where available.
+- Target room or spatial identifier, where available.
+- Local model-space anchor or transform, when supported.
+- Annotation title and note.
+- Category or issue type.
+- User-selected priority.
+- Creation/update timestamps.
+- Source model or geometry fingerprint.
+- Annotation status, if supported by the existing workflow.
+- Provenance and data-completeness information.
+
+Potential categories include:
+
+- Spatial layout observation.
+- Circulation or wayfinding concern.
+- Design coordination issue.
+- Missing or unclear model information.
+- Visual review note.
+- Follow-up inspection required.
+
+Do not present a user's priority selection as a formally assessed engineering risk.
+
+## Annotation placement
+
+Anchor annotations to a stable model-space reference or a stable supported element identifier when possible.
+
+Do not save the annotation only as a raw headset pose that becomes meaningless after the user exits VR.
+
+If a target object is removed, moved, or regenerated, detect whether the annotation can still be resolved. If not, mark it unresolved or needing review rather than quietly attaching it to an unrelated object.
+
+Preserve the model coordinate contract and apply unit conversions consistently.
+
+## Annotation display
+
+Provide a readable annotation panel in standard 3D mode and a suitable VR presentation where technically supported.
+
+Do not place long text directly in the viewer such that it obstructs the model or requires uncomfortable head movement.
+
+Support selection, dismissal, editing, deletion, and appropriate persistence according to established project conventions.
+
+Confirm destructive removal of saved notes where needed.
+
+## Scope boundary
+
+These are P49 review notes. Do not build a full decision-history platform, a design approval engine, or live multi-user collaboration.
+
+# 12. P41–P48 CROSS-DISCIPLINE REVIEW LAYERS
+
+Reuse the actual available upstream contracts. Do not make assumed integrations simply because a module name exists.
+
+Each overlay must have an identifiable source, a clear visibility toggle, a legend, and a readable explanation.
+
+## P41 — OpenBIM & IFC Interoperability
+
+Where actual IFC-derived elements or metadata exist, allow relevant element identification and source inspection.
+
+Preserve source element identifiers and unsupported-data warnings.
+
+Do not claim that all IFC properties or all IFC geometry have been imported and rendered unless that is actually established.
+
+## P42 — CAD Drawing Exchange
+
+Use only supported CAD-derived elements that have valid 3D geometry or supported interpretation.
+
+Two-dimensional reference entities must not be extruded into fabricated building geometry without a valid source rule.
+
+If P42 indicates an element is only a 2D reference, maintain that distinction in the VR review.
+
+## P43 — Terrain & Topographic Site Modeling
+
+Show the supported P43 terrain surface and related data only where the current project has valid terrain information.
+
+Preserve the distinction between raw and calibrated elevations, horizontal CRS, vertical datum, units, and source confidence wherever those fields exist.
+
+Do not claim that terrain is accurately aligned to the physical site merely because a mesh is visible.
+
+## P44 — Embodied & Whole-Life Carbon Assessment
+
+Show a read-only summary or selected-element details only where the P44 contract supports the relationship.
+
+Do not invent a spatial carbon heatmap by assigning aggregate project totals to arbitrary room surfaces.
+
+Do not recalculate carbon inside P49 or silently change P44 assessment state.
+
+Preserve warnings about missing modules, incomplete quantities, source limitations, and assessment freshness.
+
+## P45 — Climate Hazard & Resilience Analyzer
+
+Show supported assessment summaries and hazard layers only when their spatial applicability, coordinate reference, scale, and input data are appropriate.
+
+If a hazard assessment exists only as a project-level summary, display it as a summary panel rather than fabricating a spatially aligned hazard surface.
+
+Do not turn a conceptual hazard visualization into a claim of parcel-level accuracy or certified risk assessment.
+
+## P46 — Building Envelope Performance Analyzer
+
+Reuse available facade or envelope assessment metadata through the real current P46 contract.
+
+Make it possible to distinguish a semantic highlight from physical envelope thickness or geometry.
+
+Use an explicit legend for existing assessment states such as optimal, moderate, or high risk only if these states actually occur in the source contract.
+
+Do not infer temperatures, heat flow, moisture movement, or U-values from a visual colour.
+
+Show the underlying assessment's data freshness and limitations where available.
+
+## P47 — Construction Site Logistics Planner
+
+Where the existing 3D geometry and coordinate mappings support it, expose relevant site logistics overlays, vehicle paths, zones, crane footprints, and swing-radius visualizations as review layers.
+
+These are design-coordination aids. They do not substitute for a validated lift plan, equipment capacity assessment, verified construction method statement, or site safety approval.
+
+Do not label a crane movement path safe simply because the VR scene contains it.
+
+## P48 — Augmented Reality Site Visualization
+
+Reuse relevant model preparation, geometry builders, scene conventions, transform utilities, and metadata contracts from P48 wherever suitable.
+
+P49 must remain a VR review module, not a second implementation of AR.
+
+P49 must not change P48's capabilities, default placement, session behaviour, or project data merely to obtain a convenient VR view.
+
+Where common code cannot safely be reused without affecting P48, isolate the minimal P49 integration and document its purpose.
+
+The P48 `isGeospatiallyRegistered: false` state must not be silently changed or bypassed. P49 must not imply physical-world alignment just because a model can be viewed at full scale in VR.
+
+# 13. SCENE TRANSFORMS, LAYER FRESHNESS, AND VISUAL CLARITY
+
+Define a predictable scene-assembly process:
+
+1. Load the valid project and source model data.
+2. Validate inputs and identify unsupported geometry.
+3. Normalize units through one documented transformation path.
+4. Build or reuse the model using the established geometry pipeline.
+5. Apply the intended review scale and origin.
+6. Add selected overlays as separate, identifiable scene groups.
+7. Record relevant input fingerprints and source versions.
+8. Initialize interaction targets.
+9. Start immersive rendering only after the preflight succeeds.
+10. Tear down temporary resources correctly.
+
+Do not apply scale to some source groups and forget others. Confirm that relevant layers align with the same coordinate system.
+
+When a source changes, determine which overlays and annotations depend on it.
+
+Show stale results or missing layers explicitly. Do not continue displaying a stale source as current verified data.
+
+Provide a way to hide, reset, or isolate overlay groups.
+
+Use deliberate visual conventions for:
+
+- Base geometry.
+- Selected elements.
+- Review annotations.
+- Terrain.
+- P44 assessment summaries, where spatially meaningful.
+- P45 hazard information, where spatially meaningful.
+- P46 envelope highlights.
+- P47 logistics information.
+
+Do not rely on colour alone to communicate a status. Use labels, icons, legends, or patterns where practical.
+
+# 14. PERFORMANCE AND RESOURCE MANAGEMENT
+
+VR requires a responsive rendering loop. A build that succeeds on a desktop browser does not prove that the model will run adequately inside a headset.
+
+Inspect scene size, triangle count, material count, texture usage, repeated objects, geometry duplication, shadows, draw calls, and overlay cost.
+
+Implement pragmatic safeguards:
+
+- Avoid reconstructing the entire model every render.
+- Reuse existing geometry and material resources where ownership allows.
+- Avoid duplicate high-resolution meshes for decorative overlays.
+- Use sensible scene complexity limits or warnings.
+- Make expensive layers optional.
+- Avoid unnecessary real-time shadows or post-processing effects in immersive mode.
+- Use suitable pixel-ratio and rendering-quality choices according to the existing renderer and supported runtime.
+- Reduce unnecessary computation during each XR frame.
+- Avoid synchronous, expensive geometry generation in the active XR frame loop.
+- Dispose of temporary geometry, materials, textures, and subscriptions correctly.
+- Avoid disposing of shared resources still used by another active viewer.
+- Handle memory pressure or unsupported scene complexity with a fallback where possible.
+- Restore prior renderer settings after leaving immersive mode.
+- Keep model loading, preparation, rendering, and session startup errors distinguishable.
+
+Do not claim a specific headset frame rate unless it was measured on that hardware.
+
+If device performance cannot be tested in the available build environment, record that limitation in the implementation report.
+
+# 15. PERSISTENCE, PROJECT SAFETY, AND ROLLBACK
+
+Follow the actual project persistence and versioning conventions.
+
+Do not invent an independent global persistence store if the project already supports optional project-scoped properties.
+
+Persist only the information required for review and recovery, such as:
+
+- Saved annotations.
+- Review bookmarks and relevant view configuration.
+- Supported annotation targets or spatial anchors.
+- Appropriate source model fingerprints.
+- Relevant metadata and schema versions.
+
+Do not persist live headset tracking frames, raw sensory streams, temporary XR objects, or a continuously changing headset pose as project history.
+
+Before applying a project modification, create a checkpoint using the existing approved snapshot/version workflow.
+
+P49 must default to read-only inspection. Ordinary viewing, layer switching, selecting elements, and writing a review note must not silently rewrite source architecture, material, terrain, envelope, carbon, or logistics data.
+
+If a future supported operation changes the project, use a preview-and-apply workflow and preserve rollback.
+
+Ensure:
+
+1. Existing projects without P49 data load normally.
+2. A new project receives a safe empty review state.
+3. Saved notes survive ordinary reloads.
+4. Annotation targets are revalidated against the current model.
+5. Stale model fingerprints make dependent anchors or results visibly stale.
+6. Malformed review data cannot corrupt unrelated project content.
+7. Removing a review record preserves the rest of the project.
+8. Session exit does not clear valid saved notes.
+9. Checkpoints and rollback behave consistently with existing project services.
+10. Persistence failures are surfaced honestly.
+
+Use stable object IDs and normalized model-space anchors where available. Avoid relying solely on transient Three.js object references or array indexes.
+
+# 16. PRIVACY AND SECURITY
+
+P49 must not collect data merely because the XR runtime exposes it.
+
+Do not add:
+
+- Camera capture for P49.
+- Continuous microphone recording.
+- Eye-tracking collection.
+- Biometric or behavioural analytics.
+- Head-position telemetry uploads.
+- Unnecessary external data transmission.
+- Automatic sharing of review notes.
+
+Use only XR inputs needed for the implemented interaction flow.
+
+Keep user review notes and project data within the existing application storage and permission model unless an already-authorized workflow explicitly requires otherwise.
+
+Validate user-entered annotations and imported review data. Avoid injecting raw content into unsafe HTML.
+
+Do not log sensitive project notes or full project contents unnecessarily.
+
+If the runtime or application does not permit immersive mode, explain the actual blocker and retain the standard 3D fallback.
+
+# 17. USER INTERFACE AND ACCESSIBILITY
+
+Create a dedicated P49 workspace with a coherent review workflow.
+
+At minimum, provide:
+
+- Project/model selector using existing navigation conventions.
+- Preflight and model-readiness status.
+- VR support diagnostics.
+- Start immersive VR action.
+- Standard 3D fallback.
+- Navigation and comfort settings.
+- Scale and model-orientation controls where appropriate.
+- Layer visibility panel.
+- Component-inspection panel.
+- Annotation creation and review panel.
+- Saved bookmarks or review locations.
+- Stale-data and unavailable-source indicators.
+- Exit/recovery controls.
+- Clear errors and useful next steps.
+
+Avoid filling the main screen with simultaneous engineering overlays.
+
+Use logical groups and progressive disclosure. Provide an uncomplicated view for ordinary users and detailed model/source information for technically informed users.
+
+Preserve accessible standard-browser navigation even when headset controls exist.
+
+Support keyboard operation, visible focus, accessible names, readable contrast, and meaningful errors as appropriate to existing application conventions.
+
+No action should appear enabled if it does not perform its advertised function.
+
+Do not require a user to enter immersive VR to access existing annotations or inspect the source data.
+
+When VR is unsupported, clearly state that the standard 3D review remains available. Never label a desktop 3D view as “immersive VR.”
+
+# 18. TEST ARCHITECTURE
+
+Inspect the current test infrastructure and add a dedicated P49 verification suite using the actual runner conventions.
+
+Use realistic fixtures and explicit assertions. Do not rely on tests that merely check whether a function exists or an object is returned.
+
+## Group A — Capability detection
+
+Test:
+
+- `navigator.xr` unavailable.
+- `isSessionSupported` returns false.
+- `isSessionSupported` rejects.
+- Secure context unavailable.
+- WebGL renderer unavailable or failed.
+- Immersive VR supported.
+- Required security policy or focus restrictions prevent startup.
+- UI correctly offers standard 3D fallback.
+- Feature availability is not inferred solely from a user-agent string.
+
+## Group B — Session lifecycle
+
+Test:
+
+- Session startup occurs only after explicit user action.
+- Successful session start.
+- Startup failure.
+- Runtime interruption.
+- Visibility and session-end events.
+- User exits through the supported control.
+- Browser navigation or component unmount.
+- Renderer restoration.
+- No duplicate animation loops.
+- No duplicated or leaked event listeners.
+- No stale “VR active” state after a session ends.
+
+Use mocked WebXR APIs where the test environment cannot provide a physical runtime.
+
+## Group C — Model geometry and coordinates
+
+Test:
+
+- Valid model loading.
+- Empty or invalid model.
+- Known building dimensions.
+- Feet/metres normalization.
+- Scale multipliers applied exactly once.
+- Model orientation and vertical axis.
+- Valid and invalid floor-level assumptions.
+- Missing geometry warnings.
+- Unsupported CAD-only references remain unrendered as fabricated 3D objects.
+- Valid terrain and overlays align to the supported model coordinate convention.
+
+Include known expected numerical values, not only non-null checks.
+
+## Group D — Navigation and controller interactions
+
+Test:
+
+- Available controller input sources.
+- Controller ray-target resolution.
+- Selection versus annotation actions.
+- Unsupported controller/input availability.
+- Valid and invalid teleport destinations where the implementation supports floor/collision checking.
+- Snap-turn configuration.
+- Seated/stationary navigation path.
+- Cancellation and reset controls.
+- Invalid target does not trigger a mutation.
+- Interaction listeners are removed after exit.
+
+## Group E — Annotations and bookmarks
+
+Test:
+
+- Create, read, update, and delete an annotation.
+- Annotation persistence across reload.
+- Target element or spatial anchor resolution.
+- Model changes that invalidate or stale an anchor.
+- Removed elements do not silently reassign annotations to unrelated components.
+- Invalid annotation input.
+- Review notes remain separate from the authoritative model.
+- No false claim of professional risk verification.
+
+## Group F — P41–P48 coexistence
+
+Test each actual supported integration:
+
+- P41 element identifiers and source metadata.
+- P42 2D-only entities not fabricated into 3D geometry.
+- P43 terrain units and mesh alignment.
+- P44 assessment summary and missing-data state.
+- P45 source or geospatial uncertainty preserved.
+- P46 overlay state and assessment freshness.
+- P47 logistics geometry and phase filtering where supported.
+- P48 scene/transform reuse without changing AR behaviour.
+- Absent optional module data does not crash P49.
+- One overlay's visibility change does not accidentally hide or mutate unrelated model layers.
+
+## Group G — Persistence and state safety
+
+Test:
+
+- Safe default for a project with no P49 property.
+- Legacy project compatibility.
+- Review-state persistence.
+- Fingerprint and stale-state handling.
+- Snapshot before any supported project mutation.
+- Failed mutation preserves original data.
+- Rollback when the applicable workflow supports a mutation.
+- Unrelated project data remains unchanged.
+- Corrupt or oversized review data is handled safely.
+
+## Group H — Performance and resource teardown
+
+Test where the environment permits:
+
+- Repeated enter/exit cycles do not accumulate sessions or event listeners.
+- Temporary model and overlay resources are disposed of.
+- Shared resources are not destroyed while still in use.
+- A complex scene triggers documented warnings or a fallback rather than crashing.
+- Render settings restore correctly.
+- Active XR rendering is not blocked by unnecessary synchronous preparation tasks.
+
+## Group I — User experience and fallback
+
+Test:
+
+- Model preflight failure.
+- Unsupported VR browser.
+- Standard 3D review remains usable.
+- No project selected.
+- Missing geometry.
+- Missing upstream data.
+- Stale overlay.
+- Saved annotations open without immersive VR.
+- Accessible names and keyboard interactions where supported by the test environment.
+
+Do not weaken or delete existing P01–P48 tests to make P49 pass.
+
+# 19. VERIFICATION, BUILD, AND REGRESSION GATES
+
+Before reporting completion:
+
+1. Run the dedicated P49 test suite.
+2. Run the complete existing verification runner, including the P01–P48 regressions.
+3. Run the actual project lint/type-check command.
+4. Run the production build command.
+5. Inspect the final changed-file diff.
+6. Confirm P48 still behaves as before.
+7. Confirm other existing 3D viewer use cases still work.
+8. Confirm the P49 workspace is reachable through the actual navigation and routing.
+9. Confirm existing projects remain readable.
+10. Confirm P50 real-time collaboration was not implemented.
+11. Confirm no other account or repository was integrated or modified.
+12. Inspect test output to ensure counts are accurate and no failures are hidden by the runner.
+
+If a pre-existing test-reporting issue affects the count, describe the exact issue. Do not claim that all suites passed if the output is incomplete or the runner suppresses failures.
+
+A successful build does not prove WebXR support, controller functionality, headset comfort, or physical device performance.
+
+# 20. PHYSICAL HARDWARE HONESTY
+
+Keep automated and physical VR verification explicitly separate.
+
+Automated tests may verify capability branches, session-management logic, transforms, annotations, cleanup, and fallback behaviour through mocks.
+
+Only real compatible hardware and a supported runtime can verify the complete immersive experience.
+
+If physical hardware is available and actual testing can be performed, document:
+
+- Headset/device model.
+- Browser/runtime version.
+- Test date.
+- Whether immersive VR session startup succeeded.
+- Whether tracked head movement updated the scene correctly.
+- Which controllers or input modes were actually tested.
+- Whether teleportation or snap turning worked.
+- Whether annotation placement remained correctly anchored.
+- How the experience behaved when exiting or losing the session.
+- Significant performance limitations or visual defects.
+
+If hardware is unavailable, state explicitly:
+
+**“Physical VR headset testing was not performed in this environment.”**
+
+Do not fabricate physical hardware testing, headset names, performance measurements, or controller results.
+
+Do not claim “hardware verified” from a mocked XR test suite.
+
+# 21. TECHNICAL DOCUMENTATION AND SOURCE REFERENCES
+
+Document the actual implementation and the sources used.
+
+Useful official starting points:
+
+- MDN — WebXR Device API: https://developer.mozilla.org/en-US/docs/Web/API/WebXR_Device_API
+- MDN — WebXR permissions and security: https://developer.mozilla.org/en-US/docs/Web/API/WebXR_Device_API/Permissions_and_security
+- MDN — WebXR startup and shutdown: https://developer.mozilla.org/en-US/docs/Web/API/WebXR_Device_API/Startup_and_shutdown
+- MDN — WebXR lifecycle: https://developer.mozilla.org/en-US/docs/Web/API/WebXR_Device_API/Lifecycle
+- MDN — WebXR input sources: https://developer.mozilla.org/en-US/docs/Web/API/WebXR_Device_API/Inputs
+- Three.js — WebXRManager: https://threejs.org/docs/pages/WebXRManager.html
+- W3C Immersive Web — WebXR Device API specification: https://www.w3.org/TR/webxr/
+
+Confirm APIs against the versions actually installed in the codebase. Do not blindly copy examples written for a different Three.js version.
+
+Document:
+
+- P49 architecture and file responsibilities.
+- Session lifecycle and capability detection.
+- Supported navigation and input modes.
+- Scale and coordinate conventions.
+- Annotation storage and anchor resolution.
+- P41–P48 data contracts reused.
+- Source-data and overlay limitations.
+- Performance safeguards.
+- Test commands actually executed.
+- Physical hardware test status.
+- Known limitations and deferred work.
+
+Do not reproduce large copyrighted documentation passages. Write concise original technical explanations and cite appropriate source URLs.
+
+# 22. REQUIRED ACCEPTANCE CRITERIA
+
+P49 is ready for checkpoint review only when all applicable criteria below are satisfied.
+
+## Functional
+
+- A dedicated P49 workspace exists.
+- Actual supported immersive VR can be entered through the correct user-initiated flow.
+- Unsupported hardware/browser conditions produce useful diagnostics and a working 3D fallback.
+- Valid model geometry loads and follows the project's current unit and coordinate conventions.
+- Scale and orientation are consistent across the supported review scene.
+- Supported navigation and selection methods work.
+- Users can create and inspect review annotations.
+- Saved review notes remain accessible outside VR.
+- Exiting VR restores the standard viewer to a valid state.
+
+## Evidence integrity
+
+- Missing model or analysis data is never fabricated.
+- P41–P48 layers preserve source provenance and limitations.
+- Semantic overlays are not presented as fully simulated physical conditions.
+- Annotations do not claim to be independently verified engineering risks.
+- P48's non-geospatial registration status is preserved.
+
+## State and lifecycle safety
+
+- Session exit and component teardown release temporary XR resources.
+- Repeated session attempts do not create duplicate loops or stale UI states.
+- Saved review notes persist correctly.
+- Changed or removed model elements invalidate or flag dependent anchors.
+- Existing project data is preserved.
+- Any project mutation follows the established preview/checkpoint/rollback pattern.
+
+## Quality and scope
+
+- P49 tests pass.
+- The full existing verification runner is executed and reported accurately.
+- Type checking/lint and production build results are reported honestly.
+- The final diff contains no unintended modifications.
+- P48 remains functional.
+- P50 live collaboration remains unimplemented.
+- No unrelated account or repository was modified.
+
+## Physical verification
+
+Report physical device testing independently. If it was not performed, keep the status explicitly unverified rather than using an automated test pass as a substitute.
+
+Any unmet criterion must be marked incomplete, failed, or not tested—not silently treated as passed.
+
+# 23. REQUIRED FINAL IMPLEMENTATION REPORT
+
+After implementation and available verification, return a clear report using these sections:
+
+1. **Implementation summary** — what genuinely works.
+2. **Repository audit and reuse** — inspected architecture and reused components.
+3. **Files created and modified** — exact paths and purpose.
+4. **VR capabilities** — detection logic, actual session modes, and fallback behaviour.
+5. **Navigation and controller interaction** — implemented controls and supported input methods.
+6. **Scale and coordinate integrity** — exact unit convention, transformation path, and validated cases.
+7. **Annotations and review persistence** — data schema, anchoring, stale detection, and restoration.
+8. **P41–P48 integration** — the exact data reused from each module and any unavailable or read-only integration.
+9. **Session lifecycle and privacy** — handling of permissions, interruption, resource disposal, and data storage.
+10. **Testing** — exact commands, individual suite results, total suite count, and actual representative output.
+11. **Type checking and build** — exact commands and outcomes.
+12. **Physical hardware verification** — devices actually tested or the explicit statement that testing was not performed.
+13. **Known limitations** — unsupported runtime conditions, model constraints, and remaining defects.
+14. **Scope confirmation** — confirm P50 and unrelated work remained out of scope.
+15. **Acceptance checklist** — passed, failed, or not tested, with evidence.
+
+Use real file paths and real outputs. Do not invent screenshots, successful runs, headset tests, performance statistics, or source verification.
+
+Distinguish clearly between implemented, unit-tested, mocked-integration-tested, manually inspected, and physical-device-tested.
+
+Do not label the feature “Grand Audit passed,” “production certified,” “hardware verified,” or fully approved just because the code compiles and automated tests pass.
+
+# 24. FINAL EXECUTION INSTRUCTION
+
+Start by inspecting the actual Account B codebase, especially the current P48 implementation and shared 3D renderer lifecycle.
+
+Create the implementation plan and exact file-change inventory. Then implement P49 end-to-end within the existing architecture, execute the available checks, inspect the final diff, and provide the required report in the same task.
+
+Preserve working functionality. Prefer a dependable, comfortable, evidence-aware design-review workflow over decorative VR effects or an unnecessarily large feature set.
+
+Do not wait for additional confirmation to implement this scoped prompt. Do not change other roadmap prompts, merge Account A and B, modify GitHub, provision cloud services, or begin the dedicated Grand Audit.
+
+**P49's goal is to let users inspect Plotify designs from inside the virtual space, understand what the model actually represents, and leave reliable review notes—without confusing immersive visualization with engineering verification.**

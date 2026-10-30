@@ -1,0 +1,759 @@
+# PLOTIFY — PROMPT 46
+## BUILDING ENVELOPE PERFORMANCE ANALYZER
+**Account B | Locked Roadmap: P46 of P41–P50**
+
+### 1. MISSION
+
+Implement P46 — Building Envelope Performance Analyzer in the existing Plotify Account B codebase.
+
+The objective is to assess the performance of supported building-envelope assemblies and help users identify thermal inefficiencies, glazing-related concerns, potential moisture problems, thermal bridges, air-leakage concerns, and opportunities for evidence-backed improvement.
+
+The envelope includes the building elements that separate conditioned or otherwise defined indoor spaces from outdoor conditions, the ground, or other spaces with different environmental conditions.
+
+Where sufficient data exists, P46 should help users:
+
+- Define wall, roof, floor, window, door, and skylight assemblies.
+- Record their material layers, dimensions, thicknesses, and relevant material properties.
+- Calculate thermal resistance and thermal transmittance using documented methods.
+- Compare opaque assemblies and fenestration using compatible measurements.
+- Estimate heat-transfer rates for clearly defined indoor/outdoor conditions.
+- Identify supported thermal-bridge effects.
+- Assess glazing U-factor, solar heat gain, and visible-light properties where reliable data exists.
+- Screen for potential surface or interstitial condensation using an explicitly defined method.
+- Review relevant airtightness and air-leakage inputs without inventing test measurements.
+- Evaluate selected seasonal or climate scenarios using compatible data from existing project services.
+- Explain envelope weaknesses, missing inputs, calculation assumptions, and uncertainty.
+- Compare proposed envelope improvements without silently modifying the saved design.
+- Export a reproducible envelope assessment with source data, calculation traces, and limitations.
+
+**Core principle: distinguish material properties, assembly calculations, simplified performance screening, and complete building-energy or hygrothermal simulations. Do not claim that an isolated material property establishes the performance of an entire envelope.**
+
+### 2. NON-NEGOTIABLE SCOPE LOCK
+
+1. Implement P46 only.
+2. Preserve the locked Account B roadmap P41–P50.
+3. Do not implement P47 Construction Site Logistics Planner or any later roadmap feature.
+4. Do not rewrite or weaken P41 OpenBIM & IFC Interoperability, P42 CAD Drawing Exchange, P43 Terrain & Topographic Site Modeling, P44 Embodied & Whole-Life Carbon Assessment, or P45 Climate Hazard & Resilience Analyzer.
+5. Inspect the actual codebase and interfaces before modifying any files.
+6. Do not assume prior implementation reports prove that interfaces, tests, or source records still exist unchanged.
+7. Do not assume Account A's P30–P40 modules exist in this workspace.
+8. Do not connect to GitHub, push commits, merge branches, or perform cross-account integration.
+9. Do not fabricate material conductivities, insulation thicknesses, U-values, R-values, solar transmittance, airtightness measurements, moisture properties, or indoor temperatures.
+10. Do not silently guess local climate conditions, construction-layer order, moisture-control layers, or assembly boundary conditions.
+11. Do not declare a building envelope energy-code compliant merely because selected U-values satisfy a configured threshold.
+12. Do not describe a simplified condensation check as a transient hygrothermal simulation.
+13. Do not assume a visually convincing 3D model accurately represents the actual construction assembly.
+14. Do not modify original building geometry, materials, room dimensions, windows, or doors without explicit user confirmation.
+15. Preserve existing project IDs, IFC/CAD provenance, terrain records, climate-resilience data, carbon assessments, and unrelated functionality.
+16. Do not introduce unnecessary external dependencies, duplicate persistence systems, or a second competing project model.
+17. Do not remove or weaken existing tests to make P46 pass.
+18. Prioritize reproducible calculations, physical correctness, and transparent limitations over attractive visualizations.
+
+### 3. INSPECT THE ACTUAL CODEBASE FIRST
+
+Before changing files, inspect and document the actual repository.
+
+**A. Project and building geometry**
+
+Inspect:
+- The actual `Project` type and all envelope-related fields.
+- Plot dimensions, room geometry, floor/storey representation, units, and coordinate conventions.
+- Existing facade and interior specifications, design alternatives, material fields, and construction-cost metadata.
+- Existing walls, slabs, roof elements, doors, windows, skylights, and openings, if represented.
+- Whether the geometry includes element heights, thicknesses, orientation, boundaries, and surface areas.
+- Existing 3D building geometry construction and viewer components.
+- Existing geometry-derived areas and any supported room or building-volume calculations.
+
+Determine whether envelope elements are real structured objects or merely inferred from room rectangles or visual geometry.
+
+Do not infer the total wall area, actual layer thickness, roof construction, or window dimensions from unavailable data.
+
+**B. P41 — OpenBIM & IFC Interoperability**
+
+Inspect:
+- Actual IFC element and quantity types.
+- Supported IFC wall, slab, roof, door, window, and related entities.
+- Whether usable thermal properties, material layers, quantities, or property sets are preserved.
+- IFC GlobalId mappings and source provenance.
+- Existing import, export, and validation behaviour.
+
+Reuse supported information only through actual existing interfaces. An IFC element identifier alone does not establish a reliable thermal property or complete layer assembly.
+
+**C. P42 — CAD Drawing Exchange**
+
+Inspect:
+- Supported CAD entities, geometry mappings, and units.
+- Whether CAD data includes any usable envelope dimensions or layer information.
+- Existing unsupported-geometry and provenance handling.
+
+Do not treat a 2D boundary line as a fully specified wall assembly. Do not infer insulation, wall thickness, glazing U-factor, or airtightness from ordinary linework.
+
+**D. P43 — Terrain & Topographic Site Modeling**
+
+Inspect:
+- Actual terrain metadata, calibrated coordinates, vertical datum, and supported terrain geometry.
+- Existing-ground elevation and any available floor-to-ground relationships.
+- Existing visualization and site-alignment behaviour.
+
+Do not assume terrain data proves ground-contact heat transfer, subfloor insulation, soil thermal conductivity, or foundation moisture performance.
+
+**E. P44 — Embodied & Whole-Life Carbon Assessment**
+
+Inspect:
+- Actual `carbonAssessment` contracts and calculation services.
+- Existing material and emission-factor references.
+- Existing carbon scenario and report-generation behaviour.
+
+If an envelope improvement involves replacement materials, use the actual existing carbon interface only when the relevant factors and quantities are compatible. Do not create a second carbon engine or infer a carbon reduction from thermal performance alone.
+
+**F. P45 — Climate Hazard & Resilience Analyzer**
+
+Inspect:
+- Actual `climateResilience` data, source registry, scenario metadata, and climate-source adapters.
+- Supported historical and projected climate inputs.
+- Location provenance, spatial resolution, temporal coverage, and uncertainty metadata.
+- Existing heat, precipitation, wind, moisture-related, and other relevant hazard indicators.
+
+Use existing P45 data through its real interface where suitable. Do not duplicate climate-source integrations or treat a coarse-grid hazard indicator as precise envelope boundary conditions.
+
+**G. Application infrastructure**
+
+Inspect:
+- Existing project storage, limits, persistence, snapshots, checkpoints, versioning, and rollback.
+- Sidebar, project overview, routing, workspace, and component conventions.
+- Existing report export, data validation, and error-handling services.
+- Current tests, verification runner, TypeScript/lint commands, and production build.
+
+Before implementation, record available data, missing interfaces, file-change plans, and technical risks. Then proceed with the safe achievable implementation rather than stopping at an audit report unless a genuine technical blocker prevents implementation.
+
+### 4. ASSESSMENT PROFILES AND TECHNICAL REFERENCES
+
+Create explicit assessment profiles for envelope calculations and rule evaluation.
+
+A profile should specify:
+- Applicable jurisdiction and building use where relevant.
+- Selected calculation method and edition.
+- Required inputs.
+- Applicable assembly types.
+- Units and boundary conditions.
+- Whether the result is a simplified screening calculation or a standards-based assessment.
+- Known exclusions and uncertainty.
+- Any configured comparison thresholds.
+- Relevant source and rule-set version.
+
+Investigate official reference material where relevant:
+
+**ISO 6946:2017 — Building components and building elements: thermal resistance and thermal transmittance calculation methods.**
+
+Official reference:
+https://www.iso.org/standard/65708.html
+
+This standard's scope has specific exclusions, including windows and other glazed units, curtain walls, ground-coupled components, and components through which air is designed to permeate. Do not use its layer calculation as a universal method for every envelope component.
+
+**ISO 52016-1:2017 — Energy needs for heating and cooling, internal temperatures, and heat loads.**
+
+Official reference:
+https://www.iso.org/standard/65696.html
+
+This standard contains hourly or monthly calculation procedures with distinct input and model requirements. Do not claim ISO 52016-1 compliance simply because a simplified heat-transfer estimate has been implemented.
+
+**ISO 13788:2012 — Hygrothermal performance, critical surface humidity, and interstitial condensation calculation methods.**
+
+Official reference:
+https://www.iso.org/standard/51615.html
+
+Its simplified methods do not account for all important physical phenomena. Any implementation based on a simplified method must state its limitations and the conditions under which it applies.
+
+**ANSI/ASHRAE Standard 160-2021 — Criteria for Moisture-Control Design Analysis in Buildings.**
+
+Official ASHRAE reference:
+https://www.ashrae.org/technical-resources/standards-and-guidelines/titles-purposes-and-scopes
+
+Check applicable addenda, the selected edition, availability of the actual procedure, and whether the implementation satisfies the inputs and evaluation requirements. Merely citing this standard does not establish that a complete moisture-control design analysis has been performed.
+
+**ASHRAE/IES Standard 90.1 — Energy Standard for Sites and Buildings Except Low-Rise Residential Buildings.**
+
+Official reference:
+https://www.ashrae.org/technical-resources/bookstore/standard-90-1
+
+Use the applicable edition, addenda, jurisdiction, building scope, and approved compliance path. Do not automatically apply commercial-building provisions to residential buildings or assume that the most recent published edition is the locally adopted legal requirement.
+
+**ISO/TR 5863:2025 — Integrative design of the building envelope.**
+
+Official reference:
+https://www.iso.org/standard/81766.html
+
+This reference covers integrated envelope-design principles, including thermal performance, airtightness, moisture control, and related building considerations.
+
+These sources are starting points, not proof of a software implementation. Verify the current applicable status, scope, and requirements before making an alignment or compliance claim. Do not reproduce substantial copyrighted standards text.
+
+### 5. ENVELOPE ASSEMBLY INVENTORY
+
+Implement an explicit inventory of supported envelope assemblies.
+
+Potential categories include:
+- External opaque walls.
+- Internal partitions where relevant to thermal-zone separation.
+- Roofs and roof assemblies.
+- Ground-contact and exposed floors.
+- Windows and glazing systems.
+- Exterior doors and glazed doors.
+- Skylights and roof glazing.
+- Supported curtain-wall assemblies.
+- Other components only where the data and calculation method are appropriate.
+
+For each assembly, record relevant fields such as:
+- Stable assembly ID.
+- Project and element identifier.
+- Assembly category and intended application.
+- Location, orientation, and boundary condition.
+- Surface area and dimension provenance.
+- Layer sequence from the specified reference side.
+- Layer material identifier.
+- Layer thickness and unit.
+- Thermal conductivity or thermal resistance, where supported.
+- Applicable declared thermal properties.
+- Air-gap or surface-resistance treatment, where applicable.
+- Fenestration and solar properties, where applicable.
+- Source records and verification status.
+- Missing properties, exclusions, and assumptions.
+
+Use the repository's real conventions and add only the necessary backward-compatible contracts.
+
+Distinguish between:
+- Actual imported or project-defined assemblies.
+- Incomplete assemblies inferred from available geometry.
+- User-defined hypothetical assemblies.
+- Illustrative templates.
+
+An incomplete assembly must not be silently promoted to a verified real-world assembly.
+
+### 6. MATERIAL LAYERS, THERMAL RESISTANCE, AND U-VALUES
+
+Implement deterministic and independently testable thermal calculations for supported layered assemblies.
+
+For a simple, valid layer:
+- Thermal resistance may be calculated from layer thickness and compatible thermal conductivity.
+- Assembly resistance may combine appropriate layer resistances and relevant surface or air-layer contributions according to the selected method.
+- Thermal transmittance, or U-value, may be calculated as the reciprocal of the appropriate total thermal resistance where the method and assembly scope allow it.
+
+Each result must identify:
+- The layers included.
+- Their order.
+- Thickness and units.
+- Thermal conductivity or declared resistance.
+- Surface and air-layer assumptions.
+- Calculation method.
+- Exclusions and correction terms.
+- Units and numerical precision.
+
+Requirements:
+
+1. Reject missing, non-finite, zero, or physically invalid required properties where the calculation depends on them.
+2. Do not silently substitute a generic conductivity when a layer property is unknown.
+3. Use consistent units throughout the calculation.
+4. Distinguish design thermal conductivity from a generic or unverified catalogue value.
+5. Avoid double counting surface films, air layers, or correction terms.
+6. Preserve sufficient intermediate precision and round only for presentation unless the selected method requires otherwise.
+7. Do not treat doors, windows, curtain walls, or ground-coupled assemblies as ordinary layered walls if the chosen method excludes them.
+8. Account for applicable inhomogeneous-layer corrections only when supported by the implementation.
+9. Identify when an assembly requires a different calculation method.
+10. Keep reported U-values distinct from measured whole-building energy consumption.
+
+For a hypothetical example, the engine may use simple layer resistances to demonstrate how a known assembly is evaluated. Such test data must be explicitly labelled as synthetic and must not become a default property claim for a real construction material.
+
+### 7. AREA-WEIGHTED ENVELOPE PERFORMANCE
+
+When the required component U-values and compatible areas are available, calculate an area-weighted envelope transmittance for the explicitly defined component set.
+
+Document:
+- Which walls, roofs, floors, windows, and doors are included.
+- How gross and net areas are defined.
+- How window and door openings are subtracted from opaque-wall areas.
+- Which components are excluded.
+- How different boundary conditions are treated.
+- Whether thermal bridges and air leakage are included separately.
+- How incomplete assemblies affect the reported result.
+
+Never compare two assemblies using inconsistent area definitions.
+
+Do not include one component twice because it appears in both a native project model and imported IFC data.
+
+Do not treat a whole-envelope average U-value as a complete measure of building energy performance. Solar gains, thermal mass, occupancy, ventilation, system efficiency, weather, internal gains, and controls may materially affect the overall outcome.
+
+If the dataset does not contain enough information for an accurate envelope average, report the supported component results and explain the limitation.
+
+### 8. HEAT TRANSFER AND DESIGN-CONDITION SCREENING
+
+Where the necessary values exist, calculate transparent steady-state heat-transfer estimates for defined conditions.
+
+A basic component-level conductive heat-flow estimate may take the form:
+
+`Q = U × A × ΔT`
+
+where:
+- `Q` is the heat-transfer rate in compatible power units.
+- `U` is the thermal transmittance.
+- `A` is the relevant component area.
+- `ΔT` is the defined temperature difference.
+
+Use correct unit conversions and state the assumed indoor and outdoor conditions.
+
+Requirements:
+- Distinguish heating-direction and cooling-direction heat flow.
+- Show the temperature conditions used.
+- Explain that steady-state component calculations do not automatically predict annual heating/cooling energy consumption.
+- Do not treat an instantaneous design-condition estimate as a dynamic energy simulation.
+- Identify when solar radiation, thermal storage, infiltration, moisture, or other effects are not included.
+- Handle components with different boundary conditions separately.
+- Do not estimate a whole-building HVAC load using only the exterior-wall U-value.
+
+Where appropriate climate information is available through P45, use a compatible source and preserve the data period and scenario metadata. If only generic conditions are used, label the results as illustrative calculations rather than local climate predictions.
+
+### 9. WINDOWS, GLAZING, AND SOLAR PERFORMANCE
+
+Treat fenestration separately from generic opaque assemblies.
+
+Where actual data is available, record:
+- Whole-window or whole-unit U-factor, with units and source.
+- Solar heat gain coefficient or the equivalent applicable solar-transmittance property.
+- Visible transmittance, where available.
+- Glazing type and layer configuration.
+- Frame and spacer properties, where supplied.
+- Window dimensions and orientation.
+- Shading-device properties, where supported.
+- Product or test-standard references.
+- Data source and evidence status.
+
+Requirements:
+1. Do not substitute centre-of-glass U-factor for whole-window performance without explicitly explaining the difference.
+2. Do not infer a glazing system's U-factor from the number of panes alone.
+3. Do not invent solar heat gain, reflectance, or visible transmittance values from a visual tint or product name.
+4. Do not treat solar heat gain coefficient and visible transmittance as interchangeable.
+5. Avoid double counting shading effects already incorporated into a declared property.
+6. Respect orientation, shading geometry, and the quality of available incident-solar data.
+
+Where sufficient solar-irradiance and shading information exists, a documented screening calculation may estimate solar gains through supported glazing.
+
+If those inputs are unavailable, present the relevant glazing property without inventing an incident-solar value or a building cooling-load estimate.
+
+Do not claim that a glazing recommendation guarantees indoor comfort, glare control, daylight compliance, or lower annual cooling energy unless the relevant analysis actually exists.
+
+### 10. THERMAL BRIDGES AND INSULATION CONTINUITY
+
+Assess supported thermal-bridge information using actual component geometry or valid externally supplied coefficients.
+
+Potential inputs include:
+- Linear thermal transmittance, often represented by ψ in W/(m·K).
+- Point thermal-transmittance coefficient, where applicable.
+- Bridge length or count.
+- Relevant temperature difference.
+- Associated junction or component reference.
+- Source, test method, or calculation method.
+
+Where compatible evidence exists, a linear thermal-bridge contribution may be estimated as:
+
+`Q_bridge = ψ × L × ΔT`
+
+Use correct units and a well-defined boundary condition.
+
+Requirements:
+- Do not infer a reliable ψ-value from a 3D viewport alone.
+- Do not assume that every wall/roof/slab junction has the same thermal-bridge effect.
+- Do not automatically calculate metal-fastener effects unless the selected method supports the input data.
+- Do not silently include a thermal-bridge correction both in the assembly U-value and in a separate bridge calculation.
+- Explain when junction-specific modelling is required.
+- Record missing junction details and insulation-continuity information.
+
+Where actual geometric or coefficient data is missing, report a thermal-bridge screening warning or insufficient-data state instead of fabricating a precise thermal-loss result.
+
+### 11. MOISTURE, HUMIDITY, AND CONDENSATION SCREENING
+
+Implement a clearly bounded moisture-assessment workflow for supported assemblies.
+
+Potential inputs include:
+- Indoor temperature and relative humidity.
+- Outdoor temperature and relative humidity.
+- Material-layer sequence and thickness.
+- Thermal conductivity and vapour-related properties where available.
+- Relevant climate periods and boundary conditions.
+- Air and vapour-control layer locations, where represented.
+- Wetting or drying assumptions supported by the selected method.
+
+**A. Surface-condensation and critical surface-humidity screening**
+
+Where supported, calculate the necessary surface-temperature or related screening indicators using a documented method and appropriate boundary conditions.
+
+State which assumptions were made about indoor/outdoor conditions and surface heat-transfer coefficients.
+
+**B. Interstitial-condensation screening**
+
+If a simplified vapour-diffusion method is implemented, document its assumptions, limitations, and applicability. Do not imply that a simplified monthly calculation accounts for every moisture-transport phenomenon.
+
+**C. Moisture-control analysis**
+
+A full moisture-control analysis may require time-dependent climate exposure, material moisture properties, initial conditions, air movement, rain deposition, solar exposure, liquid transport, and other factors.
+
+Do not claim a full transient hygrothermal simulation unless a genuine validated solver with the required inputs is actually implemented and tested.
+
+Requirements:
+1. Do not silently assume humidity values.
+2. Do not assume the same vapour-control strategy works in both hot-humid and cold climates.
+3. Do not infer a universally correct vapour-barrier location from climate labels alone.
+4. Do not declare an assembly free of moisture risk from a simple dew-point comparison alone.
+5. Distinguish potential condensation risk from actual observed condensation.
+6. Explain the importance of drainage, drying potential, water ingress, and air leakage where relevant.
+7. Preserve the distinction between screening, detailed analysis, and professional review.
+8. Do not describe a wall as waterproof merely because it passes a simplified condensation check.
+
+If the available model lacks the material or boundary-condition inputs needed for a meaningful assessment, show the missing data and offer a supported next step rather than a fabricated pass/fail result.
+
+### 12. AIRTIGHTNESS, AIR LEAKAGE, AND AIR-BARRIER CONTINUITY
+
+Assess airtightness only when supported by explicit data.
+
+Possible inputs include:
+- A measured or documented airtightness result.
+- Test method and reference conditions.
+- Building enclosure volume, where required.
+- Supported pressure-test data.
+- Documented leakage-path or air-barrier continuity information.
+- User-defined air-change or infiltration scenario, with source and provenance.
+
+Distinguish:
+- Measured test results.
+- Modelled values.
+- Manufacturer or design claims.
+- User-entered scenario assumptions.
+- Unknown or unavailable airtightness.
+
+Do not invent air leakage simply because the envelope contains openings or visible gaps in a simplified model.
+
+Do not infer air-change rate from a building's footprint or generic material category alone.
+
+Where enough data exists, compare a measured or explicitly defined test result with a configured threshold appropriate to the applicable building type and jurisdiction.
+
+Avoid claiming that a design meets an airtightness standard unless the required test procedure, pressure conditions, building category, and applicable rule have been respected.
+
+Keep uncontrolled infiltration, designed ventilation, and HVAC-system behaviour distinct.
+
+### 13. ENVELOPE CLIMATE AND SEASONAL SCENARIOS
+
+Use P45's actual climate interface where suitable, without duplicating its source registry.
+
+Allow users to inspect supported scenarios and conditions for:
+- Typical heating or cooling season conditions.
+- Design-condition temperature differences.
+- Heat exposure and solar conditions.
+- Moisture-related boundary conditions.
+- Selected historical or future climate periods, when appropriate source data exists.
+- Sensitivity to changed boundary conditions.
+
+Requirements:
+- Retain the source, period, units, spatial resolution, and scenario identifier.
+- Distinguish actual historical observations from modelled or future projections.
+- Do not treat a coarse climate grid as detailed property-level microclimate data.
+- Do not convert a climate hazard indicator into an exact indoor temperature.
+- Do not assume a future climate scenario automatically defines statutory design conditions.
+- Show the effect of changed assumptions without altering the underlying project.
+- Do not invent hourly weather data to fill gaps in an incomplete dataset.
+
+If a full weather-file or hourly simulation pipeline does not exist, provide a supported screening workflow with explicitly stated boundary conditions.
+
+### 14. ENVELOPE QUALITY FINDINGS AND RESULT STATES
+
+Every assessed component should produce transparent, traceable results.
+
+Potential result states include:
+- Meets a configured screening criterion.
+- Does not meet a configured screening criterion.
+- Potential thermal inefficiency.
+- Potential thermal bridge.
+- Potential surface or interstitial condensation concern.
+- Missing material properties.
+- Incomplete assembly.
+- Insufficient boundary-condition data.
+- Requires further analysis.
+- Not assessed.
+- Not applicable.
+
+Use the repository's naming conventions while retaining these distinctions.
+
+Every finding should include:
+- Finding ID.
+- Associated assembly or element ID.
+- Relevant measured or calculated value.
+- Units.
+- Source references.
+- Formula or evaluation method.
+- Boundary conditions and assumptions.
+- Data provenance and uncertainty.
+- Configured threshold, where applicable.
+- Explanation and recommended next action.
+
+Do not use a universal green/red envelope grade to imply that every aspect of building performance has been assessed.
+
+A high thermal-resistance result does not automatically mean the assembly has adequate moisture control, durability, airtightness, fire performance, acoustic performance, or code compliance.
+
+If critical data is missing, do not label the full envelope as compliant or fully assessed.
+
+### 15. IMPROVEMENT SUGGESTIONS AND COMPARISON
+
+Provide explainable improvements grounded in actual findings.
+
+Potential actions may include:
+- Evaluating a better-insulated assembly.
+- Comparing alternative material layers.
+- Reviewing a glazing specification.
+- Considering a documented solar-control measure.
+- Investigating an identified thermal bridge.
+- Improving documented air-barrier continuity.
+- Rechecking moisture-control layer arrangement.
+- Identifying the information required for a detailed assessment.
+
+Every suggestion must:
+1. Link to the finding that triggered it.
+2. State which parameter changes.
+3. Explain the expected direction of effect.
+4. Provide a calculation or source-based justification when available.
+5. Identify missing evidence and trade-offs.
+6. Recalculate the supported criteria for the proposed assembly.
+7. Check for new conflicts introduced by the change.
+8. Keep the original project unchanged until confirmation.
+
+Do not automatically add insulation, modify a wall, replace glazing, or alter assembly layers without preview and explicit user confirmation.
+
+Do not call an improvement universally optimal. Higher insulation may affect moisture behaviour, drying potential, thermal bridges, assembly thickness, buildability, cost, and embodied carbon.
+
+Where P44 can provide a compatible carbon comparison, reference its actual result without duplicating the carbon engine. Otherwise, label carbon effects as unassessed rather than inventing a reduction.
+
+### 16. P43, P44, AND P45 COMPATIBILITY
+
+**P43 — Terrain & Topographic Site Modeling**
+
+- Reuse actual calibrated site information only through the inspected interface.
+- Do not infer ground thermal properties from existing-ground TIN geometry.
+- Do not treat terrain elevation as a complete ground-floor thermal boundary model.
+- Preserve terrain metadata and viewer functionality.
+- If a ground-coupled element requires an unsupported calculation method, mark that portion unassessed.
+
+**P44 — Embodied & Whole-Life Carbon Assessment**
+
+- Keep carbon calculations in P44.
+- Expose an appropriate material-change or scenario interface only if the actual P44 contract supports it.
+- Do not duplicate material emission factors or lifecycle formulas.
+- Do not automatically select an envelope option based on carbon alone.
+- Preserve existing carbon-assessment metadata.
+- Do not claim a carbon reduction without compatible quantities and evidence.
+
+**P45 — Climate Hazard & Resilience Analyzer**
+
+- Use available climate scenarios and source metadata only where compatible.
+- Keep thermal, moisture, and envelope calculations distinct from hazard-risk scoring.
+- Do not assume a flood-risk indicator proves wall watertightness or moisture performance.
+- Do not infer indoor thermal conditions from outdoor heat indicators.
+- Preserve P45 findings, provenance, and assessment freshness.
+- Do not modify the existing climate-source registry unnecessarily.
+
+Do not duplicate P43–P45 services. If an interface is absent or insufficient, implement the supported P46 subset and document the integration gap.
+
+### 17. PERSISTENCE, VERSIONING, AND DATA INTEGRITY
+
+Inspect current project-update and versioning services before changing the Project type.
+
+If needed, add an optional, backward-compatible envelope-assessment metadata field using the existing naming conventions.
+
+Requirements:
+- Use stable assembly and finding IDs.
+- Keep assessment data distinct from primary project geometry.
+- Avoid duplicating the complete project inside an assessment.
+- Preserve source and calculation provenance.
+- Record the project-state fingerprint or equivalent freshness reference.
+- Mark results stale after relevant assembly, climate, or material changes.
+- Avoid silently overwriting prior evidence when a recalculation fails.
+- Respect existing storage limits.
+- Use existing snapshot, checkpoint, and rollback infrastructure.
+- Preserve IFC, CAD, terrain, carbon, and climate-resilience metadata.
+- Ensure a failed or cancelled project update does not leave partial changes.
+- Report save failures honestly.
+- Do not create a competing persistence engine.
+
+Any new persisted records must be backward-compatible with projects that contain no P46 data.
+
+### 18. USER INTERFACE AND ACCESSIBILITY
+
+Implement a guided envelope workspace following the existing Plotify UI conventions.
+
+Suggested stages:
+
+1. **Envelope Inventory:** Inspect actual assemblies and available element properties.
+2. **Assembly Builder:** Define or review supported construction layers.
+3. **Thermal Analysis:** Review resistance, U-values, component heat transfer, and applicable thresholds.
+4. **Glazing & Solar:** Inspect supported fenestration properties and solar screening.
+5. **Moisture & Airtightness:** Review supported condensation, moisture, and air-leakage evidence.
+6. **Scenarios & Improvements:** Compare supported boundary conditions and proposed assembly changes.
+7. **Findings & Report:** Inspect formulas, source evidence, uncertainty, and remaining work.
+
+Provide:
+- Clearly labelled units.
+- Layer-order visualization where useful.
+- Missing-data indicators.
+- Formula and evidence inspection.
+- Comparison of original and proposed assembly.
+- Accessible textual finding summaries.
+- Loading, empty, error, partial-data, stale-result, and success states.
+- Keyboard navigation and visible focus.
+- Status communication that does not rely on colour alone.
+
+A 3D visualization may illustrate the assembly, but must not imply that a material layer is physically present in the actual building unless the project data establishes that relationship.
+
+### 19. PERFORMANCE, SECURITY, AND FAILURE HANDLING
+
+- Keep supported calculations deterministic and testable.
+- Avoid repeating all calculations unnecessarily on every render.
+- Validate units, inputs, dimensions, and material properties before calculation.
+- Bound expensive scenario comparisons.
+- Prevent stale requests from overwriting newer assessment results.
+- Handle malformed or legacy project records safely.
+- Distinguish calculation errors from actual performance concerns.
+- Do not silently substitute missing values.
+- Avoid blocking the UI with unbounded simulations.
+- Do not introduce an external simulation engine without validating dependencies, cost, licensing, and compatibility.
+- Do not claim live climate data or a validated solver where none is configured.
+- Do not show a success state until the operation has actually succeeded.
+
+### 20. TESTING AND REGRESSION
+
+Create a dedicated P46 test suite and register it in the actual verification runner using established repository conventions.
+
+**A. Assembly and data model**
+- Valid and invalid envelope assemblies.
+- Layer order and thickness.
+- Missing, negative, zero, or non-finite properties.
+- Unit conversion.
+- Unknown or unverified material records.
+- Legacy projects with no envelope metadata.
+
+**B. Thermal calculations**
+- Known multilayer assembly cases with hand-verified expected results.
+- Resistance and U-value calculations.
+- Appropriate surface and air-layer handling.
+- Area-weighted envelope calculations.
+- Correct gross/net area treatment.
+- Windows and other excluded component types routed to the appropriate method.
+- Ground-coupled elements refused or clearly marked unsupported where necessary.
+- Thermal-bridge calculation and no double counting.
+- Correct handling of temperature difference and heat-flow units.
+
+**C. Fenestration**
+- Whole-window versus centre-of-glass property distinction.
+- Missing U-factor, SHGC, or visible-transmittance data.
+- Solar-gain calculations with valid inputs.
+- No fabricated irradiance or shading values.
+- Consistent orientation and area handling.
+
+**D. Moisture and airtightness**
+- Supported surface-condensation screening.
+- Appropriate boundary-condition validation.
+- Simplified interstitial-condensation limitations.
+- Missing humidity or layer data.
+- Moisture-related uncertainties.
+- Missing airtightness data marked unavailable.
+- Measured versus user-entered values remain distinct.
+- No unsupported whole-assembly safety claim.
+
+**E. Scenarios and compatibility**
+- Correct P45 climate-source and scenario provenance.
+- Existing P43 terrain data preserved.
+- Existing P44 carbon calculations and metadata preserved.
+- Changes to relevant input data mark earlier results stale.
+- Scenario comparisons do not mutate the underlying project.
+
+**F. Safe updates**
+- Non-destructive preview.
+- Confirmed apply.
+- Failed or cancelled updates.
+- Snapshot creation and rollback where supported.
+- Preservation of unrelated project fields.
+
+**G. Full regression**
+- P41 IFC tests.
+- P42 CAD tests.
+- P43 terrain tests.
+- P44 carbon tests.
+- P45 climate-resilience tests.
+- Actual full verification runner.
+- Real TypeScript/lint checks.
+- Production build.
+
+Run the commands that genuinely exist in the repository. Report exact commands, actual suite counts, results, and failures. Do not weaken existing tests or claim an unexecuted test passed.
+
+Synthetic test fixtures must not be presented as evidence of universal compliance, actual-building performance, or the validity of every possible construction assembly.
+
+### 21. DOCUMENTATION
+
+Create a specification following repository conventions, such as:
+
+`docs/P46_BUILDING_ENVELOPE_PERFORMANCE_ANALYZER_SPECIFICATION.md`
+
+Document:
+- Actual pre-implementation inspection findings.
+- Supported assembly categories and layer model.
+- Calculation profiles and technical references.
+- Supported thermal, glazing, thermal-bridge, moisture, and airtightness calculations.
+- Formulas, units, and boundary conditions.
+- Data provenance and missing-data behaviour.
+- Known limitations and unimplemented simulation methods.
+- P43/P44/P45 interfaces actually reused.
+- Persistence, versioning, and rollback behaviour.
+- Exact files created and modified.
+- Test commands and observed results.
+- Future integration needs and P47–P50 boundaries.
+
+Do not describe planned functionality as implemented or claim standards compliance without sufficient evidence.
+
+### 22. ACCEPTANCE CRITERIA
+
+P46 is ready for review only when:
+
+1. The actual codebase and P41–P45 interfaces have been inspected.
+2. Supported envelope assemblies have explicit, validated input data.
+3. Thermal calculations use compatible units and documented methods.
+4. Fenestration and ground-coupled assemblies use appropriate calculation boundaries.
+5. Missing material or climate data cannot silently create a passing result.
+6. Thermal bridges are calculated only from supported inputs, without double counting.
+7. Moisture screening is clearly distinguished from a validated transient hygrothermal simulation.
+8. Airtightness results are based on actual measurements, documented models, or labelled assumptions.
+9. Heat-transfer estimates are not misrepresented as complete annual energy simulation.
+10. Improvement suggestions are evidence-backed and non-destructive until confirmed.
+11. P43, P44, and P45 behaviour and metadata remain intact.
+12. P46 and relevant P41–P45 regression tests have actually been run.
+13. TypeScript/lint and production-build outcomes are reported accurately.
+14. Known limitations, changed files, and future integration requirements are documented.
+15. P47–P50 have not been implemented.
+16. No GitHub operation or cross-account integration has been performed.
+17. P46 is not marked Verified, Approved, or Complete unless the required checks genuinely passed.
+
+### 23. REQUIRED FINAL IMPLEMENTATION REPORT
+
+Provide a structured report with:
+
+1. Initial architecture inspection.
+2. Exact files created and modified.
+3. Supported envelope types and assembly representation.
+4. Implemented calculation methods and their technical basis.
+5. Actual thermal-resistance, U-value, and heat-transfer calculations.
+6. Glazing, solar, and thermal-bridge support.
+7. Moisture/condensation assessment method and limitations.
+8. Airtightness capability and evidence requirements.
+9. Climate scenarios and P45 interface behaviour.
+10. P43 terrain and P44 carbon compatibility.
+11. Project persistence, assessment freshness, snapshots, and rollback.
+12. Exact test commands and observed results.
+13. Actual full-suite count, TypeScript/lint, and production-build results.
+14. Known defects, unsupported assemblies, and unverified claims.
+15. Future integration requirements and shared-file risks.
+16. Confirmation that P47–P50, GitHub operations, and cross-account integration were not performed.
+17. Acceptance criteria passed, failed, or remaining unverified.
+
+**Final priority: physically valid envelope calculations, source-traceable properties, climate-aware interpretation, transparent uncertainty, preserved project state, and reliable future integration. A simplified screening result must never be advertised as a complete building simulation.**

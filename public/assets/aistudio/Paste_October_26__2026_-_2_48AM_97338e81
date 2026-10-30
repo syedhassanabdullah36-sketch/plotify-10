@@ -1,0 +1,901 @@
+# PLOTIFY — PROMPT 47
+## CONSTRUCTION SITE LOGISTICS PLANNER
+**Account B | Locked Roadmap: P47 of P41–P50**
+
+### 1. MISSION
+
+Implement P47 — Construction Site Logistics Planner in the existing Plotify Account B codebase.
+
+The objective is to provide an integrated planning workspace for organizing construction-site access, movement, deliveries, storage, equipment, temporary facilities, work zones, utilities, waste handling, site safety constraints, and phase-dependent logistics.
+
+P47 should help users answer practical questions such as:
+
+- Where can construction vehicles enter, exit, turn, queue, load, and unload?
+- How can pedestrian and vehicle movements be separated?
+- Where can materials be delivered, unloaded, stored, protected, and retrieved?
+- Can deliveries be scheduled without conflicting with site access, lifting operations, or other planned work?
+- Where should cranes, hoists, forklifts, telehandlers, loading zones, and other equipment be planned, subject to the required technical information and professional approval?
+- How can emergency routes, fire access, exits, utilities, and protected areas be kept clear?
+- How should the site layout evolve as construction progresses?
+- Which proposed arrangements create spatial conflicts, access restrictions, excessive material handling, or logistical bottlenecks?
+- How do weather, terrain, ground conditions, neighbouring properties, environmental controls, and site constraints affect the plan?
+- What evidence is available, what remains unknown, and which decisions require approval by a qualified site professional?
+
+The workspace should connect a spatial site-logistics plan with structured operational information, delivery planning, phase-based layouts, risk findings, resource requirements, and exportable reports.
+
+**Core principle: P47 is an evidence-based construction logistics planning and decision-support tool. A visually clear site layout is not proof of safe lifting, adequate ground-bearing capacity, legal compliance, or an approved construction method.**
+
+### 2. NON-NEGOTIABLE SCOPE LOCK
+
+1. Implement P47 only.
+2. Preserve the locked Account B roadmap P41–P50 and its existing feature titles and order.
+3. Do not implement P48 Augmented Reality Site Visualization, P49 Immersive VR Design Review, or P50 Live Multi-User Design Collaboration.
+4. Do not rewrite or weaken P41 OpenBIM & IFC Interoperability, P42 CAD Drawing Exchange, P43 Terrain & Topographic Site Modeling, P44 Embodied & Whole-Life Carbon Assessment, P45 Climate Hazard & Resilience Analyzer, or P46 Building Envelope Performance Analyzer.
+5. Inspect the actual repository, project types, services, UI patterns, and tests before changing files.
+6. Do not assume earlier implementation reports prove that their described interfaces or functionality still exist unchanged.
+7. Do not assume Account A's P30–P40 code exists in this workspace.
+8. Do not connect to GitHub, push commits, merge branches, or perform cross-account integration.
+9. Do not invent property boundaries, access permissions, road widths, vehicle dimensions, turning radii, site traffic volumes, delivery times, crane capacities, ground-bearing capacities, utility locations, emergency routes, or regulatory clearances.
+10. Do not assume every construction site has the same operating conditions or applicable legal rules.
+11. Do not represent a conceptual crane, lifting zone, temporary road, storage yard, or emergency route as technically approved without the necessary evidence.
+12. Do not optimize logistics solely for speed or cost if the proposed arrangement violates a known safety constraint.
+13. Do not silently resolve conflicts by moving buildings, changing site boundaries, altering terrain, removing obstacles, or overwriting existing project data.
+14. Preserve existing project identifiers, site geometry, terrain metadata, carbon assessments, climate-risk information, envelope assessments, IFC/CAD provenance, and unrelated project records.
+15. Do not introduce an unnecessary external dependency, duplicate project model, duplicate persistence system, or unverified live logistics integration.
+16. Do not weaken or remove existing tests to make P47 pass.
+17. If a requested capability cannot be calculated safely from the available information, mark it unassessed and explain what is required.
+
+### 3. INSPECT THE ACTUAL REPOSITORY BEFORE IMPLEMENTATION
+
+Before modifying any file, inspect and document the actual Account B codebase.
+
+#### A. Project, site and geometry model
+
+Inspect:
+
+- The actual `Project` type and project/site identifiers.
+- Plot dimensions, units, coordinate conventions, site boundary data, and site-context fields.
+- Existing floor-plan, storey, structural, MEP, regulation, budget, and scenario representations.
+- Existing building footprints, site obstacles, access points, and north-orientation conventions.
+- Existing 2D and 3D rendering components and their coordinate transformations.
+- Existing geometry validation, distance, intersection, and pathfinding utilities.
+- Whether roads, gates, parking areas, loading zones, boundaries, and site restrictions already have structured representations.
+
+Do not infer that a plotted line represents a verified property boundary or a legal right of access.
+
+#### B. P41 — OpenBIM & IFC Interoperability
+
+Inspect:
+
+- Actual IFC import/export contracts and the supported IFC profile.
+- Imported building footprints, storeys, spaces, structural columns and beams, and preserved elements.
+- Existing GlobalId mappings and project provenance.
+- Existing units, coordinates, and geometry limitations.
+- Whether any imported element can legitimately contribute to site-layout planning.
+
+Reuse only actual available interfaces. Do not modify the IFC parser or silently change its support claims.
+
+#### C. P42 — CAD Drawing Exchange
+
+Inspect:
+
+- CAD drawing import, layer mapping, calibration and validation.
+- Supported entities and geometric limitations.
+- Existing CAD provenance and project-application process.
+- Whether any source layer contains verified site boundaries, roads, existing buildings, utilities, or obstacles.
+
+Treat imported CAD features as source geometry with known provenance, not automatically as legally surveyed or construction-approved information.
+
+Do not infer terrain elevation, wall height, material quantities, or ground capacity from 2D CAD lines.
+
+#### D. P43 — Terrain & Topographic Site Modeling
+
+Inspect:
+
+- `terrainModeling` and its actual source-data structure.
+- Calibrated site coordinates, units, CRS, and vertical datum.
+- Existing-ground points, contours, terrain boundaries, and TIN meshes.
+- Supported slope and relief calculations.
+- Existing terrain rendering and point-persistence limits.
+
+Use available terrain information to understand site shape or identify potential route constraints only where its quality and accuracy justify the analysis.
+
+Do not treat a terrain surface as proof of compaction, soil strength, bearing capacity, excavation stability, drainage performance, or the suitability of temporary roads.
+
+#### E. P44 — Embodied & Whole-Life Carbon Assessment
+
+Inspect:
+
+- Actual carbon-assessment metadata, factor registry, and scenario engine.
+- Existing construction-material quantities and source provenance.
+- Whether the engine can receive supported inputs from construction-material transport or site-operation scenarios.
+
+Avoid duplicating P44's carbon calculations. Do not calculate precise transport, fuel, waste, or equipment emissions without the necessary activity data and compatible factors.
+
+#### F. P45 — Climate Hazard & Resilience Analyzer
+
+Inspect:
+
+- Actual site location and climate-resilience interfaces.
+- Supported precipitation, extreme-heat, wind, flood and other hazard information.
+- Source dates, spatial resolution, scenarios, and uncertainty metadata.
+- Existing climate hazard assessments and staleness behaviour.
+
+Use only relevant, compatible results. Do not assume a general climate indicator provides a precise construction-day weather forecast.
+
+#### G. P46 — Building Envelope Performance Analyzer
+
+Inspect:
+
+- Existing envelope metadata and building-element relationships.
+- Supported envelope geometry, openings, and source provenance.
+- Existing workspace conventions and any related construction interfaces.
+
+P47 may use existing building geometry to plan access, material staging or installation sequencing, but must not implement P46's envelope simulation or recreate its calculation engine.
+
+#### H. Persistence and testing infrastructure
+
+Inspect:
+
+- Existing project persistence and storage limits.
+- Versioning, checkpoint, snapshot and rollback services.
+- Existing project-state update patterns.
+- Sidebar, navigation, project overview, and workspace-routing conventions.
+- Current test files and the complete verification runner.
+- Actual TypeScript/lint and production-build commands.
+- Existing report and export functionality.
+
+Record the real interfaces, missing data, planned files, technical risks, and safe reuse options. Then implement the achievable P47 functionality. Do not stop at an audit report unless a genuine blocker prevents safe implementation.
+
+### 4. SITE LOGISTICS DATA MODEL
+
+Design a clear, typed, extensible logistics model that follows existing project conventions.
+
+Introduce only the contracts necessary for actual implemented functionality. Conceptual entities may include:
+
+- `SiteLogisticsPlan`
+- `SiteLogisticsPhase`
+- `SiteLogisticsZone`
+- `SiteAccessPoint`
+- `SiteTrafficRoute`
+- `PedestrianRoute`
+- `VehicleRoute`
+- `DeliverySchedule`
+- `DeliveryRequirement`
+- `MaterialStorageArea`
+- `LoadingUnloadingZone`
+- `ConstructionEquipmentPlacement`
+- `LiftingOperationPlan`
+- `TemporaryFacility`
+- `TemporaryUtilityRequirement`
+- `SiteRestriction`
+- `EmergencyAccessRequirement`
+- `LogisticsConflict`
+- `LogisticsRiskFinding`
+- `LogisticsAlternative`
+- `LogisticsPlanValidationResult`
+
+Use actual repository naming patterns rather than creating every conceptual type exactly as written.
+
+#### Data requirements
+
+Where relevant, store:
+
+- Stable record ID.
+- Project/site ID.
+- Record type and purpose.
+- Site-local coordinates and applicable units.
+- Geometry or location reference.
+- Associated phase or time interval.
+- Applicable operating constraints.
+- Capacity or dimensional properties, with their evidence source.
+- Source data, assumptions and provenance.
+- Validation status and conflict references.
+- User-confirmation status.
+- Optional responsible role or approval record where the workflow supports it.
+- Revision, timestamp and assessment freshness information.
+
+Requirements:
+
+1. Use stable identifiers rather than display names or array indices.
+2. Separate proposed logistics arrangements from verified existing site conditions.
+3. Distinguish observed or surveyed geometry, imported geometry, user-entered data, and illustrative assumptions.
+4. Avoid duplicating the complete project into the logistics record.
+5. Use backward-compatible optional metadata where justified.
+6. Preserve the original project and existing site data.
+7. Validate all geometry, dimensions, dates, capacities, and cross-references before saving.
+8. Avoid introducing a second competing storage or versioning system.
+
+### 5. SITE BOUNDARY, ACCESS AND EXISTING-CONDITION PLANNING
+
+Provide a workflow for defining or reviewing the construction site.
+
+Where the actual data supports it, represent:
+
+- Site boundary and permitted operating area.
+- Existing buildings and structures.
+- Construction footprint.
+- Site entrances and exits.
+- Internal access roads and temporary tracks.
+- Adjacent public roads and pedestrian paths.
+- Neighbouring properties and protected boundaries.
+- Existing obstacles and restricted zones.
+- Utility corridors and known overhead or underground services.
+- Existing vegetation, protected areas, watercourses, or environmental constraints where documented.
+- Surveyed levels and other site restrictions where data is available.
+
+Requirements:
+
+- Clearly identify whether a site boundary is surveyed, imported, user-entered, or illustrative.
+- Do not infer permission to use adjacent land or public roads.
+- Flag missing survey, utility or access-right information when it affects a proposed arrangement.
+- Provide a visible distinction between existing conditions and planned temporary works.
+- Avoid moving permanent building geometry when editing a logistics layout.
+- Preserve the original CAD and IFC source records.
+- Do not claim that a route is physically available merely because a line can be drawn over the site.
+
+If the project lacks a reliable boundary or scale, permit an explicitly labelled conceptual layout while preventing it from being presented as a construction-ready site plan.
+
+### 6. VEHICLE ACCESS AND TRAFFIC MANAGEMENT
+
+Create a planning workflow for construction traffic and access routes.
+
+Where enough data exists, include:
+
+- Delivery-vehicle entry and exit points.
+- Vehicle route geometry.
+- One-way and two-way route concepts.
+- Vehicle categories, dimensions and operating constraints.
+- Turning areas and vehicle swept-path checks where supported.
+- Loading, unloading and holding areas.
+- Parking and vehicle waiting areas.
+- Route widths and overhead clearances.
+- Gradients and surface conditions where known.
+- Gate and access restrictions.
+- Reversing-risk locations.
+- Visibility and manoeuvring constraints.
+- Conflicts with pedestrians, storage, machinery and other routes.
+
+Use documented geometry checks for the actual vehicle dimensions and movement model.
+
+Do not rely on an arbitrary circular turning radius as proof that a long vehicle can manoeuvre through a complex path. When swept-path analysis is unavailable, label turning feasibility as unassessed or requiring professional review.
+
+#### Traffic-management principles
+
+Apply the relevant principles from authoritative site-safety guidance where appropriate:
+
+- Separate pedestrian and vehicle routes where practicable.
+- Minimize unnecessary vehicle movements and reversing.
+- Organize gates, roadways, signs and route instructions coherently.
+- Avoid blocked pedestrian access and unsafe crossing points.
+- Consider delivery vehicle visibility and movement control.
+- Keep traffic routes appropriate for the types and quantities of vehicles expected.
+- Identify places that may require a one-way system, controlled crossing, barriers, trained marshal or other documented control.
+
+Reference guidance:
+- UK HSE, Traffic management on site: https://www.hse.gov.uk/construction/safetytopics/vehiclestrafficmanagement.htm
+- UK HSE, Site traffic routes and layout: https://www.hse.gov.uk/WORKPLACETRANSPORT/checklist/section2.htm
+- Ireland HSA, Construction Site Traffic Management Plan: https://www.hsa.ie/eng/your_industry/construction/resources-for-contractors/create_a_construction_site_traffic_management_plan/
+
+These sources have jurisdiction-specific scopes. They are references for planning principles, not universal legal rules for every country.
+
+Do not declare a traffic plan legally compliant simply because it implements pedestrian/vehicle separation.
+
+### 7. PEDESTRIAN ROUTES AND SITE SEGREGATION
+
+Represent safe intended pedestrian circulation separately from vehicle route planning.
+
+Where supported, assess:
+
+- Worker and visitor entry routes.
+- Routes from site entry to sign-in or induction locations.
+- Access to temporary offices, welfare facilities and designated work areas.
+- Crossings between pedestrian paths and vehicle routes.
+- Route continuity and width.
+- Temporary obstructions and restricted zones.
+- Lighting and visibility requirements as recorded constraints.
+- Segregation barriers or controlled crossing points.
+- Routes that need to remain available during different construction phases.
+
+Requirements:
+
+1. Do not infer that a road is safe for pedestrians simply because it is geometrically connected.
+2. Detect intersections between pedestrian and vehicle route geometries.
+3. Distinguish a planned crossing point from an uncontrolled conflict.
+4. Identify where protective barriers, crossing controls, signage, visibility measures or operational review may be needed.
+5. Do not invent verified site barriers, markings, lighting or safety installations.
+6. Where human movement data is unavailable, do not claim to have calculated actual pedestrian congestion or crowd safety.
+7. Preserve the distinction between route feasibility and formal safety approval.
+
+P47 is not a substitute for a site-specific construction safety plan or competent-person review.
+
+### 8. MATERIAL DELIVERY AND RECEIVING PLANNING
+
+Create a structured workflow for planning construction deliveries.
+
+A delivery record may contain:
+
+- Delivery ID.
+- Material or equipment description.
+- Quantity and unit.
+- Vehicle category and dimensions where known.
+- Supplier or source where recorded.
+- Requested date/time or delivery window.
+- Expected arrival duration where known.
+- Gate and route assignment.
+- Unloading zone and handling method.
+- Temporary staging or storage destination.
+- Handling constraints and prerequisites.
+- Dependencies on equipment, crew or installation phase.
+- Source, confirmation status and uncertainty.
+
+Support a delivery calendar or schedule view with clearly defined date/time inputs.
+
+Where the necessary data exists, identify:
+- Conflicting delivery windows.
+- Simultaneous use of the same unloading zone.
+- Potential vehicle queue conflicts.
+- Delivery times outside the documented site operating window.
+- Deliveries requiring equipment or operators that are not available in the selected phase.
+- Deliveries that conflict with restricted routes or planned lifting activities.
+- Materials arriving before suitable storage or installation is available.
+
+Do not invent supplier lead times, actual arrival times, truck capacities, or site-specific delivery restrictions.
+
+Where no live scheduling or supplier connection exists, manage a transparent user-entered schedule. Do not claim live delivery tracking.
+
+### 9. MATERIAL STORAGE AND STAGING
+
+Provide a spatial planning workflow for materials, temporary laydown areas and staging locations.
+
+Where supported, record:
+
+- Material type and quantity.
+- Storage area location and dimensions.
+- Capacity and its source.
+- Required access and handling approach.
+- Storage duration or relevant phase.
+- Environmental protection requirements, where documented.
+- Separation requirements and incompatible materials, where verified.
+- Stack height or loading limits only when evidence supports the values.
+- Whether the area is reserved, occupied, proposed or unavailable.
+
+Assess supported conflicts such as:
+
+- Storage extending beyond permitted site boundaries.
+- Overlapping storage areas.
+- Storage obstructing routes, exits, fire access or loading areas.
+- Inadequate storage area for a specified quantity where the volume calculation is supported.
+- Materials requiring protection or handling conditions that have not been accounted for.
+- Storage conflicting with a later construction phase.
+
+Requirements:
+
+- Do not calculate a reliable storage-stack capacity without the necessary product, packaging, geometry and loading information.
+- Do not assume ground-bearing capacity from terrain surface elevation.
+- Do not prescribe stack heights without applicable material, stability and safety information.
+- Do not infer hazardous-material compatibility without the relevant safety data and applicable handling rules.
+- Treat storage suitability as conditional when required evidence is missing.
+
+Where material handling distances can be calculated from valid routes, distinguish actual route distance from straight-line distance.
+
+### 10. EQUIPMENT, CRANES, HOISTS AND LIFTING OPERATIONS
+
+Provide a planning framework for construction equipment and lifting-operation locations, while keeping critical technical decisions within verified engineering and site-management processes.
+
+Potential equipment categories include:
+
+- Mobile cranes.
+- Tower cranes.
+- Hoists and material lifts.
+- Forklifts and telehandlers.
+- Excavators and earthmoving equipment.
+- Concrete pumps and delivery vehicles.
+- Scaffolding and temporary access equipment.
+- Other equipment relevant to the actual project.
+
+For each equipment record, capture relevant known properties such as:
+
+- Equipment ID and category.
+- Footprint or placement area.
+- Required operating zone.
+- Manufacturer/model or source reference, if applicable.
+- Relevant dimensions and rated capacities where documented.
+- Operating radius and lifting envelope, where supported.
+- Setup or outrigger area, where relevant.
+- Clearance restrictions and known exclusion zones.
+- Applicable work phase.
+- Access and maintenance requirements.
+- Source and validation status.
+
+#### Critical safety boundaries
+
+- Do not calculate lifting capacity from generic equipment dimensions.
+- Do not infer a crane load chart, boom configuration, lifting radius, outrigger reaction, or ground-bearing requirement from a visual model.
+- Do not approve crane locations without the necessary site, equipment, ground and lifting information.
+- Do not invent overhead power-line or underground-utility clearances.
+- Do not treat a drawn exclusion zone as a verified safe exclusion zone unless the required technical and operational information is present.
+- Do not claim that a lift plan is approved merely because equipment footprints do not overlap.
+- Identify missing engineered lift plans, utility surveys, ground information or relevant approvals as explicit blockers where they affect the proposed operation.
+
+Where sufficient data exists, perform preliminary spatial conflict checks between equipment operating zones, building geometry, roads, storage, overhead restrictions and other equipment.
+
+Clearly distinguish a preliminary layout check from an engineered lift study or authorized lifting operation.
+
+### 11. TEMPORARY FACILITIES AND SITE SERVICES
+
+Provide spatial planning for relevant temporary facilities.
+
+Potential facilities include:
+
+- Site offices and meeting facilities.
+- Worker welfare and sanitary facilities.
+- First-aid and designated emergency-information locations.
+- Security and access-control points.
+- Temporary storage and workshops.
+- Waste collection and segregation areas.
+- Temporary power distribution.
+- Potable water and other temporary service locations.
+- Charging or equipment service areas where supported.
+- Covered walkways or public-interface protection where required.
+- Other site facilities supported by the current model.
+
+For each facility, identify:
+- Location and footprint.
+- Applicable capacity, where documented.
+- Relevant phase.
+- Access requirements.
+- Service dependencies.
+- Constraints and known exclusions.
+- Required source evidence or human review.
+
+Do not fabricate utility routes, capacities, connections, installation dates, or service availability.
+
+Ensure the layout can identify conflicts between temporary facilities and permanent construction, vehicle routes, emergency access, pedestrian access, and material storage.
+
+### 12. EMERGENCY ACCESS, FIRE SAFETY, SECURITY AND PUBLIC PROTECTION
+
+Treat critical emergency and public-interface constraints as protected planning requirements.
+
+Where the relevant information is available, represent:
+
+- Emergency vehicle access.
+- Required emergency routes and turning/access zones.
+- Existing exits and escape routes.
+- Fire-service access points.
+- Muster or assembly locations where designated.
+- Restricted and controlled-access areas.
+- Site boundaries and public access points.
+- Pedestrian routes adjacent to the construction site.
+- Known falling-object or overhead-work protection zones.
+- Utility isolation points only where their locations are verified.
+- Site security and visitor-control arrangements.
+
+Requirements:
+
+1. Do not silently permit storage, parking, deliveries, temporary facilities or equipment to obstruct a required emergency route.
+2. Flag conflicts with known exits and protected routes.
+3. Do not infer statutory fire-access dimensions without the applicable jurisdiction, building context and source.
+4. Do not invent emergency facilities or call points.
+5. Distinguish user-entered emergency provisions from verified site conditions.
+6. Ensure unassessed critical access requirements are shown explicitly.
+7. Preserve protected routes across phase changes unless an authorized replacement arrangement is documented and approved.
+8. Make it possible to see which logistics objects prevent the protected route from remaining clear.
+
+Relevant general reference:
+- UK HSE, Protecting the public on construction sites: https://www.hse.gov.uk/construction/safetytopics/publicprotection.htm
+
+This does not replace local emergency-planning, fire-safety, or construction regulatory requirements.
+
+### 13. TEMPORARY ROADS, GROUND CONDITIONS AND WEATHER CONSTRAINTS
+
+Where supported, evaluate temporary access-route suitability as a logistics-planning problem.
+
+Potential inputs include:
+
+- Route geometry and width.
+- Longitudinal and cross slope, where reliable data exists.
+- Vehicle weight and operating characteristics.
+- Ground condition and bearing information, if supplied.
+- Surface construction and drainage information.
+- Turning, headroom and visibility constraints.
+- Known utility locations.
+- Environmental restrictions.
+- Relevant weather-related operational constraints.
+
+Use P43's actual terrain data to understand the available surface geometry, not to invent geotechnical properties.
+
+Use P45's actual hazard and climate context where relevant, but do not treat broad climate-projection indicators as a short-term weather forecast.
+
+If real current weather data is available through an actual existing service, show its source and timestamp. Otherwise, use explicitly configured weather-risk assumptions only as scenarios.
+
+Do not declare a temporary road safe for a specified vehicle solely because its geometric width and slope are acceptable.
+
+Ground strength, settlement, drainage performance, bearing capacity, and temporary-works design require appropriate evidence and competent review.
+
+Identify where further survey, ground investigation, temporary-works design, or site inspection is needed.
+
+### 14. CONSTRUCTION PHASING AND TEMPORARY LAYOUT EVOLUTION
+
+Support phase-based logistics planning so the site can evolve during construction.
+
+Possible phases include:
+
+- Site establishment and enabling works.
+- Ground preparation and excavation.
+- Foundations and below-ground work.
+- Structural frame.
+- Building-envelope installation.
+- Internal trades and fit-out.
+- External works and landscaping.
+- Commissioning and handover.
+
+These are example phases, not a requirement to impose the same sequence on every project.
+
+Requirements:
+
+1. Allow a plan to contain phase-specific routes, zones, storage locations and equipment placements.
+2. Define the active phase and its time range where supported.
+3. Show which objects are active, planned, removed or unavailable in each phase.
+4. Identify conflicts created when the building footprint changes or previously available access becomes blocked.
+5. Preserve protected access requirements across transitions.
+6. Identify equipment or storage that must be relocated before a phase changes.
+7. Detect when a delivery schedule depends on an uncompleted prerequisite.
+8. Record assumptions if no genuine construction schedule exists.
+9. Do not fabricate a detailed project programme or claim critical-path scheduling when the inputs are insufficient.
+10. Avoid silently changing existing design geometry when a phase layout is modified.
+
+If the current repository does not contain a genuine scheduling engine, implement a simple, typed phase and dependency model with explicit dates or ordering. Do not create a fake advanced scheduler.
+
+### 15. DELIVERY, RESOURCE AND ACTIVITY CONFLICT DETECTION
+
+Develop a deterministic conflict engine for supported site-logistics objects.
+
+Detect applicable conflicts such as:
+
+- Vehicle-route overlap with protected pedestrian routes.
+- Vehicle manoeuvring conflicts with gates or known obstacles.
+- Storage overlapping routes, exits or access zones.
+- Delivery windows competing for the same gate, staging area or unloading equipment.
+- Equipment operating zones intersecting protected areas or other equipment zones.
+- Equipment placement obstructing emergency access.
+- Temporary facilities intersecting construction work zones.
+- Phase changes that invalidate an existing route or storage arrangement.
+- Resource conflicts in supported delivery or equipment schedules.
+- Missing prerequisites for planned operations.
+- Spatial conflicts with known services or utilities.
+
+Each conflict must identify:
+- Conflict ID.
+- The affected objects.
+- Applicable phase and time interval.
+- Conflict category.
+- Geometric or schedule test.
+- Severity or priority.
+- Required evidence.
+- Explanation.
+- Suggested resolution, where supported.
+
+Keep severity distinct from technical certainty. A high-priority conflict may still require field confirmation; an unverified route must not be treated as clear merely because no computational collision was detected.
+
+Do not generate arbitrary conflict-free plans by silently deleting or moving user-defined objects.
+
+### 16. ACCESSIBILITY, ENVIRONMENTAL CONTROLS AND WORKING CONDITIONS
+
+P47 must coordinate with relevant site needs without attempting to implement separate roadmap features.
+
+Where data exists, allow logistics plans to consider:
+
+- Worker welfare access.
+- Pedestrian and visitor routes.
+- Public interface and accessible detours where relevant.
+- Waste segregation and removal.
+- Dust, noise, runoff, mud and other documented environmental controls.
+- Material protection from weather.
+- Spill-control provisions where applicable.
+- Water and energy service requirements.
+- Temporary lighting.
+- Restricted work zones.
+- Permitted work hours, where documented.
+
+Do not make unsupported environmental-impact calculations or declare compliance with environmental permits.
+
+Do not build a dedicated universal accessibility audit, climate-hazard engine, or building-envelope simulation inside P47. Reuse relevant existing information through actual interfaces and identify missing assessments.
+
+### 17. MATERIAL HANDLING DISTANCES, TIME AND COST ESTIMATES
+
+Provide logistics metrics only where source data and calculation methods are appropriate.
+
+Potential metrics include:
+
+- Actual or network-based route distance.
+- Delivery counts and scheduled volumes.
+- Number of access or unloading conflicts.
+- Storage utilization, where capacity is known.
+- Planned equipment occupancy.
+- Handling or travel time under explicit assumptions.
+- Estimated delivery or transport costs when supported by rates.
+- Construction-transport carbon when the required activity data and compatible P44 factors exist.
+
+Requirements:
+
+1. Distinguish network distance from straight-line distance.
+2. Distinguish estimated travel time from measured site performance.
+3. State assumptions for vehicle speed, loading time, waiting time and work duration.
+4. Do not invent current supplier prices, transport rates, fuel consumption or equipment productivity.
+5. Avoid deriving a project completion date from incomplete logistics data.
+6. Expose the assumptions behind every estimate.
+7. Do not force an estimate when its important inputs are missing.
+
+If a metric cannot be calculated reliably, report it as unavailable or allow a clearly labelled user-entered scenario.
+
+### 18. P41–P46 COMPATIBILITY
+
+P47 must add a logistics layer that complements existing Account B features.
+
+**P41 — OpenBIM & IFC Interoperability**
+
+- Reuse actual supported building geometry and identifiers where suitable.
+- Preserve IFC GlobalId mappings and provenance.
+- Do not duplicate the IFC parser or modify its supported profile.
+- Do not assume every element has complete site or construction properties.
+
+**P42 — CAD Drawing Exchange**
+
+- Reuse actual site-boundary or plan geometry only through its real interface.
+- Preserve coordinate and unit transformations.
+- Do not invent 3D building heights, material quantities or utility locations from 2D linework.
+- Preserve CAD metadata and supported export/import behaviour.
+
+**P43 — Terrain & Topographic Site Modeling**
+
+- Use actual calibrated terrain geometry where suitable.
+- Respect coordinate reference systems, units and terrain-data provenance.
+- Do not treat a TIN as proof of soil strength, bearing capacity, stability or drainage capability.
+- Preserve existing terrain state and viewer functionality.
+
+**P44 — Embodied & Whole-Life Carbon Assessment**
+
+- Use compatible existing material-transport or site-operation carbon calculations only through the actual interface.
+- Avoid double counting transport or construction waste.
+- Do not duplicate the lifecycle carbon engine.
+- Report carbon estimates only when required quantities, factors and lifecycle boundaries are available.
+
+**P45 — Climate Hazard & Resilience Analyzer**
+
+- Use actual relevant hazard indicators and source metadata where compatible.
+- Distinguish long-term climate context from operational weather conditions.
+- Do not turn a broad flood or wind indicator into a verified construction-site operating threshold.
+- Preserve climate assessment records and source provenance.
+
+**P46 — Building Envelope Performance Analyzer**
+
+- Use existing building geometry where appropriate to define delivery, installation and access constraints.
+- Do not implement thermal, moisture or envelope performance calculations.
+- Do not alter the approved envelope to improve logistics without the required explicit user action and design review.
+
+If a source interface is absent, do not fabricate it. Implement the best supported P47 subset and document the missing contract for future integration.
+
+### 19. FUTURE ROADMAP BOUNDARIES: P48–P50
+
+Keep P47 focused on construction-site logistics.
+
+- **P48 — Augmented Reality Site Visualization:** Do not implement AR.
+- **P49 — Immersive VR Design Review:** Do not implement VR.
+- **P50 — Live Multi-User Design Collaboration:** Do not implement real-time collaboration, shared editing or synchronization.
+
+Document possible future handoff points where useful without creating the later modules in advance.
+
+### 20. USER INTERFACE AND WORKFLOW
+
+Implement a guided Construction Site Logistics workspace using the existing Plotify UI and routing conventions.
+
+Suggested stages:
+
+1. **Site & Constraints:** Inspect site boundaries, access points, known restrictions and source-data quality.
+2. **Site Layout:** Place or review logistics zones, routes, access points and temporary facilities.
+3. **Traffic & Pedestrian Routes:** Inspect vehicle routes, pedestrian separation, intersections and turning constraints.
+4. **Materials & Deliveries:** Manage delivery requirements, staging, storage, unloading and handling prerequisites.
+5. **Equipment & Lifting:** Review equipment placement and supported spatial constraints.
+6. **Construction Phases:** Organize phase-specific layouts, availability, transitions and dependencies.
+7. **Conflict & Risk Review:** Inspect spatial, schedule, resource, access and evidence-related findings.
+8. **Optimize & Compare:** Preview proposed logistics alternatives without changing the saved plan.
+9. **Reports & Handoff:** Export the selected plan, findings, assumptions, required approvals and unresolved items.
+
+The actual UI may combine stages if that matches existing application conventions, but all implemented capabilities must remain accessible.
+
+Provide:
+- Clear layer controls and object selection.
+- Separate display styles for existing geometry, proposed logistics objects and restrictions.
+- Dimension and coordinate labels with explicit units.
+- Conflict overlays and a textual findings list.
+- Phase selector and schedule representation.
+- Object-property editing.
+- Clear preview, cancel and apply controls.
+- Source provenance and unverified-data indicators.
+- Loading, empty, warning, insufficient-data, stale-result and failure states.
+
+Do not rely on colour alone to communicate critical access or safety conflicts. Provide explanatory labels and accessible status text.
+
+### 21. PREVIEW, APPLY, PERSISTENCE AND ROLLBACK
+
+Inspect the existing project persistence and versioning services before modifying the project model.
+
+If needed, introduce a minimal, optional, backward-compatible `siteLogistics` metadata field or equivalent using the repository's real naming conventions.
+
+Requirements:
+
+1. Keep proposed logistics geometry separate from permanent building geometry.
+2. Use stable object IDs and references to actual project/site elements.
+3. Preserve existing terrain, building, CAD, IFC, carbon, climate and envelope metadata.
+4. Keep source data and user-defined proposals distinguishable.
+5. Validate object geometry, dates, units and references before application.
+6. Preview all meaningful changes before saving.
+7. Use the existing checkpoint/snapshot mechanism for significant changes where appropriate.
+8. Support cancellation without mutating the project.
+9. Provide rollback where the existing architecture permits it.
+10. Avoid partially applying a phase or schedule change.
+11. Respect existing storage limits.
+12. Invalidate stale conflict results when relevant layout, phase, delivery or equipment information changes.
+13. Do not claim saved status until persistence succeeds.
+14. Do not create a second storage or versioning system.
+
+### 22. SECURITY, PERFORMANCE AND FAILURE HANDLING
+
+- Validate imported and user-entered records.
+- Reject malformed geometry, dates, non-finite numbers and incompatible units.
+- Apply reasonable input-size and object-count limits.
+- Prevent unbounded schedule-conflict or route-search operations.
+- Avoid recalculating the entire project on every minor interaction.
+- Prevent stale asynchronous analysis results from overwriting newer ones.
+- Handle missing data and legacy projects gracefully.
+- Do not silently replace unavailable capacities or dimensions with fabricated defaults.
+- Do not create fake live tracking or supplier connections.
+- Preserve the project's usability if optional services are unavailable.
+- Report calculation errors distinctly from actual logistics conflicts.
+- Ensure cancelled or failed operations do not corrupt saved state.
+
+### 23. TESTING AND REGRESSION
+
+Create a dedicated P47 test suite and register it in the actual verification runner using established repository conventions.
+
+**A. Site geometry and provenance**
+- Valid and invalid site boundaries.
+- Coordinate and unit validation.
+- Imported, user-entered and illustrative geometry distinctions.
+- Access points outside valid boundaries.
+- Missing or ambiguous site dimensions.
+- Overlapping logistics zones.
+
+**B. Traffic and pedestrian routes**
+- Vehicle-route geometry.
+- Pedestrian/vehicle route intersection.
+- Known obstacle conflicts.
+- Supported turning and swept-path tests.
+- One-way restrictions and entry/exit constraints.
+- Route width and clearance checks where the data supports them.
+- Missing vehicle properties or road geometry.
+- No false safe-route result when required evidence is missing.
+
+**C. Deliveries and storage**
+- Valid delivery records.
+- Duplicate identifiers.
+- Invalid dates, quantities and units.
+- Overlapping unloading windows.
+- Delivery prerequisite and equipment conflicts.
+- Storage-area capacity and overlap tests where supported.
+- Obstruction of protected routes or exits.
+- Missing supplier or capacity data.
+
+**D. Equipment and lifting**
+- Equipment footprint overlap.
+- Equipment operating-zone conflicts.
+- Missing dimensions or capacity data.
+- Protected access and exclusion-zone conflicts.
+- No fabricated ground capacity or lift approval.
+- Unsupported crane or lifting calculations remain unavailable.
+
+**E. Phasing and scheduling**
+- Phase-specific layout changes.
+- Equipment and storage availability by phase.
+- Conflicting route transitions.
+- Delivery schedule clashes.
+- Missing prerequisites.
+- Stale schedule and conflict detection.
+- Preservation of previously saved phases after cancellation or failed updates.
+
+**F. Safety and evidence honesty**
+- Protected emergency routes remain flagged when obstructed.
+- Missing access permissions do not become approved.
+- Unverified utility and ground data remain clearly labelled.
+- Safety-critical conflicts cannot be hidden by a cost or speed score.
+- User confirmation is required for meaningful plan changes.
+
+**G. P41–P46 regression**
+- Existing IFC operations.
+- Existing CAD operations.
+- Terrain metadata and visualization.
+- Carbon-assessment results and metadata.
+- Climate-resilience metadata and source provenance.
+- Envelope-assessment results and staleness behaviour.
+- Existing project persistence and rollback.
+
+**H. System verification**
+- Run the dedicated P47 test suite.
+- Inspect and execute the real full verification runner.
+- Run actual TypeScript/lint checks.
+- Run the production build.
+
+Report exact commands, actual suite counts, failures and observed results. Do not remove or weaken existing tests. Synthetic tests do not prove a real construction site's traffic plan or lifting arrangement is safe.
+
+### 24. DOCUMENTATION
+
+Create a specification following repository conventions, such as:
+
+`docs/P47_CONSTRUCTION_SITE_LOGISTICS_PLANNER_SPECIFICATION.md`
+
+Document:
+- Initial repository inspection.
+- Supported site-logistics objects and data model.
+- Site boundary, route, and access assumptions.
+- Traffic and pedestrian-route validation methods.
+- Delivery and material-storage workflows.
+- Equipment and lifting-plan limitations.
+- Temporary facilities, utilities and environmental constraints.
+- Construction phase and schedule handling.
+- Conflict categories and calculation methods.
+- P41–P46 interfaces actually used.
+- Persistence, versioning and rollback.
+- Exact files created and modified.
+- Tests run and actual outcomes.
+- Known limitations, unresolved risks and required professional approvals.
+- Future integration requirements and P48–P50 boundaries.
+
+Do not document planned functionality as already implemented.
+
+### 25. ACCEPTANCE CRITERIA
+
+P47 is ready for review only when:
+
+1. The actual codebase and relevant P41–P46 contracts have been inspected.
+2. Supported logistics objects have explicit, typed definitions.
+3. Site boundaries and coordinate units are handled correctly.
+4. Vehicle and pedestrian conflicts can be identified for supported route geometry.
+5. Delivery, unloading, storage, equipment and phase conflicts are detected where data supports them.
+6. Emergency access and protected constraints remain visible.
+7. Missing information never becomes a false safety or feasibility pass.
+8. Crane, lifting, ground-bearing and other engineering-critical calculations are not fabricated.
+9. The planner distinguishes conceptual layout checks from professional approvals.
+10. Changes remain non-destructive until the user confirms them.
+11. P41–P46 metadata and core functionality remain intact.
+12. P47 and relevant regression suites have actually been executed.
+13. TypeScript/lint and production-build results are reported accurately.
+14. Known limitations and future integration risks are documented.
+15. P48–P50 have not been implemented.
+16. No GitHub operation or cross-account integration has been performed.
+17. P47 is not marked Verified, Approved or Complete unless the required checks genuinely passed.
+
+### 26. REQUIRED FINAL IMPLEMENTATION REPORT
+
+Provide a structured report with:
+
+1. Initial repository inspection findings.
+2. Exact files created and modified.
+3. Implemented site-layout and logistics data structures.
+4. Site boundaries, route, access and traffic-management features.
+5. Pedestrian segregation and protected-route checks.
+6. Delivery scheduling, staging, storage and unloading functionality.
+7. Equipment-placement and lifting-operation support and limitations.
+8. Temporary facilities, utilities, waste and environmental controls.
+9. Construction phases, dependencies and schedule-conflict handling.
+10. Implemented logistics metrics and their calculation methods.
+11. Safety-critical missing-data and professional-approval boundaries.
+12. P41–P46 compatibility and regression results.
+13. Data persistence, snapshots, rollback and stale-result handling.
+14. Exact test commands, outcomes, actual suite counts, TypeScript/lint and production-build results.
+15. Known defects, unsupported features, assumptions and workarounds.
+16. Future integration needs, shared-file changes and dependencies.
+17. Confirmation that P48–P50, GitHub operations and cross-account integration were not performed.
+18. Acceptance criteria that passed, failed or remain unverified.
+
+**FINAL PRIORITY:** safe and explainable site-logistics planning, consistent site geometry, transparent evidence, realistic delivery and storage coordination, protected access constraints, data integrity, and maintainable future integration. Do not trade safety or truthfulness for a visually impressive or artificially optimized logistics plan.

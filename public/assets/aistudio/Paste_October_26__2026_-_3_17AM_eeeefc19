@@ -1,0 +1,716 @@
+# PLOTIFY — PROMPT 48
+## AUGMENTED REALITY SITE VISUALIZATION
+**Account B | Locked Roadmap: P48 of P41–P50**
+
+### 1. MISSION
+
+Implement P48 — Augmented Reality Site Visualization in the existing Plotify Account B codebase.
+
+The objective is to let users visualize supported Plotify building and site models in their real physical surroundings using augmented reality, where the actual device, browser, rendering engine, permissions, and spatial-tracking capabilities support the experience.
+
+Users should be able to inspect the relationship between proposed building geometry and the surrounding physical environment, understand the intended placement and scale, adjust a preview using supported controls, and return to Plotify's ordinary 3D workspace without losing project state.
+
+The feature should aim to support:
+
+- Real-time AR presentation of a selected building or site model.
+- User-controlled surface detection and initial placement.
+- Correct model scale based on Plotify's actual measurement units.
+- Controlled position and orientation adjustment.
+- Visualization of supported building geometry and relevant site/terrain context.
+- Optional display of supported site boundaries, terrain, floor levels, or selected envelope elements.
+- Placement-quality warnings, tracking-status information, and calibration controls.
+- Repositioning, hiding, and removing the AR preview without altering the source project.
+- Capture of placement metadata or screenshots only where the actual platform supports the operation and the user explicitly requests it.
+- Graceful fallback to the existing 3D viewer when immersive AR is unavailable.
+- Evidence and limitations explaining whether the model is merely locally placed in the user's surroundings or genuinely aligned with known geographic coordinates.
+
+**Core principle: an AR overlay is a visualization, not a survey, a construction set-out instrument, or proof that a building will physically fit or can safely be constructed at the displayed location.**
+
+### 2. NON-NEGOTIABLE SCOPE LOCK
+
+1. Implement P48 only.
+2. Preserve the locked Account B roadmap P41–P50 and its existing titles and sequence.
+3. Do not implement P49 Immersive VR Design Review or P50 Live Multi-User Design Collaboration.
+4. Do not rewrite or weaken P41 OpenBIM & IFC Interoperability, P42 CAD Drawing Exchange, P43 Terrain & Topographic Site Modeling, P44 Embodied & Whole-Life Carbon Assessment, P45 Climate Hazard & Resilience Analyzer, P46 Building Envelope Performance Analyzer, or P47 Construction Site Logistics Planner.
+5. Inspect the actual repository and existing interfaces before modifying files.
+6. Treat earlier implementation reports as claims to verify, not substitutes for inspecting the actual code.
+7. Do not assume Account A's P30–P40 code exists in the current workspace.
+8. Do not connect to GitHub, push commits, merge branches, or perform cross-account integration.
+9. Do not fabricate device compatibility, AR tracking, camera access, geographic alignment, surface detection, physical dimensions, or environmental lighting data.
+10. Do not claim that the AR experience works on every phone or browser.
+11. Do not silently substitute an ordinary 3D view or camera overlay and label it immersive AR.
+12. Do not change the underlying project geometry merely to place it in an AR scene.
+13. Do not overwrite existing site coordinates, terrain calibration, project origin, or units.
+14. Do not claim survey-grade accuracy, centimetre-level accuracy, or verified building-to-site alignment unless the actual measurement system and its accuracy have been established.
+15. Do not request camera or spatial-tracking permissions before the user deliberately starts the AR experience.
+16. Do not collect, store, or upload camera frames, environmental imagery, or unnecessary location information by default.
+17. Do not introduce an external dependency, native application requirement, or paid service without checking its compatibility, maintenance, licensing, privacy implications, and costs.
+18. Do not weaken existing tests to make P48 pass.
+19. If a required capability is unsupported, communicate the limitation and provide the strongest honest alternative.
+
+### 3. INSPECT THE ACTUAL CODEBASE FIRST
+
+Before editing any file, inspect and document the actual Account B repository.
+
+#### A. Existing rendering and 3D architecture
+
+Inspect:
+- The actual React, TypeScript, Vite, and rendering-engine versions.
+- Existing Three.js or other 3D rendering configuration.
+- `src/components/viewer3d/building3dGeometry.ts` and `Building3DViewer.tsx`, if they still exist in the reported form.
+- How building geometry is generated, transformed, scaled, and positioned.
+- The actual relationship between project-local coordinates, building geometry, floor levels, plot dimensions, and vertical axes.
+- Existing lighting, camera controls, geometry disposal, rendering lifecycle, and error handling.
+- Existing scene objects or user interactions that can be safely reused.
+- Whether the app already uses `WebGLRenderer.xr`, an XR manager, or another XR-related interface.
+
+Do not create a second competing scene engine or reimplement the complete building geometry generator for P48.
+
+#### B. Project geometry and units
+
+Inspect the actual:
+- `Project` type and unit conventions.
+- `floorPlan`, floors/storeys, structural geometry, plot dimensions, and building origin.
+- P41 IFC and P42 CAD geometry mappings.
+- P43 terrain mesh, calibrated points, terrain origin, CRS and vertical datum.
+- P46 envelope metadata.
+- P47 site logistics layout, route geometry, restrictions, and phase information.
+
+Determine which project elements are suitable for visualization and which are only 2D, approximate, incomplete, or read-only.
+
+#### C. Existing infrastructure
+
+Inspect:
+- Navigation and workspace-routing conventions.
+- Project selection and project-state handling.
+- Storage limits, versioning, snapshots, and rollback.
+- Existing validation and error-reporting patterns.
+- Existing WebGL resource disposal and component lifecycle handling.
+- Test scripts and the full verification runner.
+- TypeScript/lint commands and production-build process.
+- Any existing browser compatibility or capability-detection utilities.
+
+Identify the actual files that must change and the minimal interfaces needed for AR.
+
+Record the inspection findings, risks, supported capabilities, and planned changes. Then implement the achievable feature rather than stopping at an audit report, unless a genuine technical blocker prevents a safe implementation.
+
+### 4. DEVICE AND BROWSER CAPABILITY DETECTION
+
+Implement reliable feature detection before offering to start an immersive AR session.
+
+The system must determine, where the browser exposes the necessary APIs:
+
+- Whether the current page is in a secure context.
+- Whether the relevant XR API exists.
+- Whether an `immersive-ar` session is supported.
+- Whether the required rendering and tracking features are available.
+- Whether a suitable hit-test capability exists, if required by the chosen placement workflow.
+- Whether the required permission-policy configuration allows the operation.
+- Whether the current rendering device and graphics configuration can initialize the experience.
+- Whether the user has denied a required permission.
+- Whether the session has ended, lost tracking, or failed during startup.
+
+Use genuine feature detection and capability checks rather than user-agent strings alone.
+
+For a WebXR implementation, investigate the actual supported Three.js XR APIs and their compatibility with the repository's installed version.
+
+Official technical references:
+- WebXR Device API: https://developer.mozilla.org/en-US/docs/Web/API/WebXR_Device_API
+- WebXR permissions and security: https://developer.mozilla.org/en-US/docs/Web/API/WebXR_Device_API/Permissions_and_security
+- WebXR lifecycle: https://developer.mozilla.org/en-US/docs/Web/API/WebXR_Device_API/Lifecycle
+- Three.js WebXRManager: https://threejs.org/docs/pages/WebXRManager
+
+Requirements:
+
+1. Do not assume all browsers support `immersive-ar`.
+2. Do not assume that desktop browsers provide handheld-camera AR.
+3. Do not assume that a browser supports hit testing merely because basic WebXR functionality exists.
+4. Request an AR session only after an explicit user action.
+5. Handle unsupported features without uncaught exceptions.
+6. Display a clear explanation when the current device/browser cannot run the immersive experience.
+7. Avoid using an inaccurate UA-based browser detector as the only compatibility check.
+8. Distinguish an unsupported browser from a permission denial or runtime failure.
+
+If a required feature is unavailable, gracefully disable the relevant AR controls and provide the supported non-AR visualization fallback.
+
+### 5. AR EXPERIENCE MODES AND HONEST FALLBACKS
+
+Provide clearly named viewing modes.
+
+**Mode A — Immersive AR**
+
+Use the actual supported immersive-AR session and its real tracking capabilities.
+
+Where available, use surface hit testing or another verified AR placement mechanism to help the user choose a physical placement point.
+
+**Mode B — Standard 3D Site Preview**
+
+Use the existing Plotify 3D scene for users or devices that cannot run immersive AR.
+
+This mode may provide orbit, zoom, pan, model inspection, and a site-context view if the existing viewer supports them.
+
+It must not claim to show the model physically anchored to the real surroundings.
+
+**Mode C — Manually Calibrated Placement Preview**
+
+Offer manual placement or orientation controls when they can be implemented accurately enough for a useful preview.
+
+This mode must disclose that the alignment is user-calibrated and does not establish surveyed geographic placement.
+
+Do not display a live camera background as though it were tracking-aware AR when the model is merely superimposed on camera imagery without reliable spatial tracking.
+
+Do not pretend that a screenshot, camera permission, or device gyroscope alone provides accurate plane detection, world anchoring, or geographic registration.
+
+If marker-based placement is considered, implement it only if a genuine supported detection method exists and its marker requirements, tracking behaviour, and scale assumptions are documented. Do not invent a marker detector or claim marker tracking merely because a marker image can be uploaded.
+
+### 6. PROJECT MODEL SELECTION AND PREVIEW PREPARATION
+
+Before entering AR, allow the user to select the project and supported model contents to visualize.
+
+Possible display components include:
+- Building mass and exterior shell.
+- Existing supported structural geometry.
+- Floor/storey outlines.
+- Terrain surface and site boundary.
+- Selected envelope components.
+- Selected site-logistics zones where the actual source geometry and coordinate conventions are compatible.
+
+Do not require every component to be rendered.
+
+Provide a preflight summary showing:
+- Project name or ID.
+- Model content selected.
+- Model units.
+- Bounding dimensions.
+- Current coordinate/origin conventions.
+- Available terrain and site calibration information.
+- Unsupported or omitted model elements.
+- Potential performance or geometry issues.
+- Whether the preview uses source geometry, generated geometry, or an approximation.
+
+Validate that the selected model contains renderable content.
+
+Handle empty models, malformed geometry, non-finite dimensions, incompatible units, excessive triangle counts, and missing storeys gracefully.
+
+Do not modify the source project during AR preparation.
+
+### 7. REAL-WORLD SCALE AND UNIT NORMALIZATION
+
+Correct scale is fundamental to the AR experience.
+
+Inspect the actual project unit and convert geometry into the units required by the rendering and XR scene consistently.
+
+Requirements:
+
+1. Establish a documented internal scene-unit convention.
+2. Convert source project units explicitly.
+3. Preserve the relative size of all model elements.
+4. Avoid applying the same unit conversion twice.
+5. Ensure nested geometry and parent transforms do not introduce unintended scaling.
+6. Validate overall model dimensions before entering AR.
+7. Show the model's estimated physical dimensions in the UI.
+8. Provide an identifiable scale reference where appropriate.
+9. Keep the intended real-scale display as the default where the source dimensions are valid.
+10. Clearly distinguish an intentionally scaled miniature preview from full-scale AR.
+
+If the source geometry has unknown or inconsistent dimensions, do not silently treat it as metres.
+
+Optional scale adjustment may be useful for illustrative or miniature viewing. If provided:
+- Label it as a display scale adjustment.
+- Show the applied scale factor.
+- Identify that the model is no longer shown at verified real-world scale.
+- Keep scale calibration separate from the saved architectural dimensions.
+
+Never change the original building dimensions as a side effect of AR scaling.
+
+### 8. SITE ORIGIN, ORIENTATION, AND SPATIAL ALIGNMENT
+
+Create an explicit coordinate-transformation workflow for placing Plotify geometry in the AR reference space.
+
+The workflow must distinguish:
+
+- Project-local coordinates.
+- Plot or site coordinates.
+- Terrain-local coordinates.
+- AR reference-space coordinates.
+- Geographic coordinates, when available.
+- User-selected real-world anchor or placement point.
+- Display orientation and alignment adjustments.
+
+Document the transformations between applicable coordinate systems.
+
+Requirements:
+
+1. Identify the project origin and axis directions.
+2. Respect actual floor and elevation conventions.
+3. Preserve the model's geometry and relative relationships.
+4. Keep terrain and building placement consistent where their coordinate relationship is valid.
+5. Do not assume that project north equals AR-session forward.
+6. Provide a user-controlled initial orientation or reference-direction adjustment where supported.
+7. Detect likely unit, orientation, or origin mismatches.
+8. Show a placement preview before confirming the model location.
+9. Let the user cancel or reset placement.
+10. Prevent stale or mismatched calibration information from silently positioning a model incorrectly.
+
+**Local AR placement is not the same as geographic registration.**
+
+A normal surface hit test can locate an object relative to the device's current AR session. It does not automatically place the building at its surveyed geographic coordinates.
+
+Do not claim GNSS-, GPS-, north-aligned, survey-grade, or geospatial-anchor accuracy unless an actual compatible system provides that capability, the necessary permissions and calibration are supported, and the implementation is validated.
+
+If precise geospatial AR is unavailable, use clearly labelled local placement and manual alignment rather than fabricating a real-world coordinate match.
+
+### 9. AR SESSION STARTUP AND SURFACE PLACEMENT
+
+Implement a reliable session lifecycle.
+
+**A. Start preflight**
+
+Before requesting AR:
+- Confirm supported session capability.
+- Verify the model can be rendered.
+- Check the required scene and camera configuration.
+- Explain the camera/spatial-tracking permission request to the user.
+- Show known limitations and necessary preparation.
+
+**B. Session start**
+
+- Start the session from an explicit user interaction.
+- Request only the necessary capabilities for the selected workflow.
+- Handle permission denial, browser refusal, unsupported features, and runtime errors.
+- Prevent duplicate session creation.
+- Prevent multiple concurrent animation loops or renderer sessions.
+- Avoid leaking resources when initialization fails.
+
+**C. Placement preview**
+
+Where hit testing is supported:
+- Display a placement reticle only when valid surface-hit information exists.
+- Distinguish detected surfaces from uncertain or unavailable tracking.
+- Do not allow confirmation of an invalid placement.
+- Let the user choose and review the initial placement point.
+- Keep the model hidden or in an explicit preview state until placement is confirmed, where appropriate.
+
+**D. Placement confirmation**
+
+- Place the model relative to the actual current AR session/reference space.
+- Preserve scale and orientation.
+- Provide a clear confirmation state.
+- Allow resetting or repositioning through supported controls.
+- Keep the source project unchanged.
+
+Do not claim that a hit-tested surface has been surveyed or certified as level, structurally suitable, or appropriate for construction.
+
+### 10. TRACKING, ANCHORING, AND RELOCALIZATION
+
+Use actual supported tracking/anchor capabilities, and clearly distinguish them from application-level transforms.
+
+Where the chosen browser/device supports suitable anchors:
+- Create or use anchors only through the genuine API.
+- Track whether an anchor remains valid.
+- Detect tracking loss and session reset where feasible.
+- Handle changes in the reference space.
+- Restore or recreate a placement only when the operation is supported and reliable.
+- Avoid accumulating transform errors through repeated resets.
+- Provide a user-visible state for degraded or lost tracking.
+
+Where persistent world anchors are unsupported, do not fabricate cross-session persistence.
+
+Do not assume a locally placed model will remain fixed to the same real-world location after the user leaves the AR session or reopens the page.
+
+If the session loses tracking:
+- Make the loss visible.
+- Avoid implying that the previous alignment is still accurate.
+- Pause or reset placement-dependent interactions as appropriate.
+- Allow the user to re-establish placement through a genuine supported workflow.
+
+Saved project metadata may retain the user's intended placement configuration, but it must not claim that the physical anchor remains valid across sessions unless the underlying technology supports it.
+
+### 11. 3D RENDERING AND VISUAL QUALITY
+
+Integrate AR with the actual existing Plotify 3D geometry and rendering architecture.
+
+Support an appropriate visual representation of:
+- Building exterior and massing.
+- Storey divisions.
+- Terrain surface.
+- Building-to-site relationship.
+- Selected structural or envelope details where useful.
+- Site boundary and optional site-logistics elements where the geometry is compatible.
+
+Requirements:
+
+1. Reuse the existing building geometry generation rather than duplicating the complete geometry pipeline.
+2. Ensure the AR scene uses the same source dimensions as the 3D viewer.
+3. Keep visible layer toggles consistent with the selected project content.
+4. Distinguish source geometry from simplified or illustrative elements.
+5. Avoid accidental clipping or missing geometry caused by incorrect origin or camera setup.
+6. Render with transparent/AR-compatible backgrounds where the selected renderer and session support it.
+7. Avoid unnecessarily expensive real-time shadows, reflective materials, or post-processing effects on constrained devices.
+8. Provide clear visibility settings for terrain and optional site layers.
+9. Respect object and material disposal when content is hidden, replaced, or removed.
+10. Avoid introducing duplicate render loops or GPU-resource leaks.
+
+If realistic lighting estimation is not supported by the target device or implementation, do not simulate or claim physically measured environmental lighting.
+
+### 12. USER CONTROLS AND INTERACTION
+
+Provide appropriate AR controls that work with the supported device.
+
+Potential controls include:
+- Start AR.
+- Exit AR.
+- Choose or reset placement.
+- Adjust orientation.
+- Reset to intended scale.
+- Toggle building, terrain, and supported site layers.
+- Inspect model metadata.
+- Show/hide dimensions.
+- Recenter the view where supported.
+- Reposition a locally anchored model.
+- Save a supported placement configuration.
+- Return to the ordinary 3D viewer.
+
+Requirements:
+- Use understandable labels and explanatory tooltips.
+- Prevent accidental changes to the underlying model.
+- Ensure controls remain usable on small screens.
+- Avoid relying on gestures that cannot be performed on the target device.
+- Provide alternative buttons for actions that would otherwise require unsupported gestures.
+- Communicate whether a control changes the AR placement, the preview display, or the actual saved design.
+
+Never allow a placement or transform control to silently change the project’s original dimensions.
+
+### 13. CAMERA PERMISSIONS, PRIVACY, AND SAFETY
+
+Treat camera and spatial-tracking access as sensitive user-controlled capabilities.
+
+Requirements:
+
+1. Explain why camera and tracking access are needed before starting AR.
+2. Request permissions only in the appropriate user-triggered flow.
+3. Handle denied or revoked permissions gracefully.
+4. Do not circumvent device or browser permission controls.
+5. Do not collect or upload camera imagery by default.
+6. Do not record video or save environmental imagery without an explicit, supported user action.
+7. If screenshots are supported, clearly distinguish a rendered screenshot from a saved project update.
+8. Store only the minimal placement metadata required.
+9. Do not retain detailed location information unnecessarily.
+10. Respect session termination and release camera/XR resources appropriately.
+
+Display an appropriate safety reminder that the user should remain aware of their surroundings, avoid unsafe movement while viewing the screen, and never rely on an AR overlay to determine construction boundaries or safe working distances.
+
+P48 must not encourage users to walk into traffic, restricted areas, excavation zones, or construction hazards while operating AR.
+
+### 14. PERFORMANCE AND RESOURCE MANAGEMENT
+
+AR experiences may run on devices with limited thermal, battery, GPU, and memory resources.
+
+Implement:
+- A controlled render lifecycle.
+- Reasonable scene-complexity limits.
+- Geometry/material reuse where safe.
+- Efficient visibility handling.
+- Resource cleanup on exit and component unmount.
+- Handling for browser tab suspension and session interruption.
+- Prevention of duplicate animation loops.
+- Responsive rendering and aspect-ratio management.
+- Graceful handling of WebGL/XR initialization failure.
+- Clear recovery from renderer context loss where practical.
+
+Do not automatically load every project element and every detailed mesh if a simplified model is sufficient for the requested visualization.
+
+Where model simplification is needed, preserve the intended scale and important spatial relationships. Label omitted details.
+
+Do not silently degrade geometry in a way that could make boundaries or dimensions misleading.
+
+### 15. P41–P47 COMPATIBILITY
+
+**P41 — OpenBIM & IFC Interoperability**
+- Use only supported imported geometry and preserve original IFC provenance.
+- Do not rewrite the IFC parser/exporter.
+- Distinguish preserved imported elements from native editable project geometry.
+- Do not assume that all IFC elements are suitable for real-time AR rendering.
+
+**P42 — CAD Drawing Exchange**
+- Reuse supported project geometry or supported CAD-derived geometry only through actual interfaces.
+- Respect calibrated units and coordinate transformations.
+- Do not extrude 2D CAD lines into invented 3D structures.
+- Preserve CAD source metadata.
+
+**P43 — Terrain & Topographic Site Modeling**
+- Reuse actual calibrated terrain geometry when available.
+- Preserve its CRS and vertical-datum provenance.
+- Distinguish surveyed source points from interpolated terrain surfaces.
+- Do not claim terrain accuracy beyond its documented source.
+- Handle large terrain meshes within existing resource limits.
+
+**P44 — Embodied & Whole-Life Carbon Assessment**
+- Do not create a carbon-calculation engine inside P48.
+- If the user inspects carbon data, show the existing result and provenance only through the actual interface.
+- Keep AR placement independent from carbon-assessment data.
+
+**P45 — Climate Hazard & Resilience Analyzer**
+- Do not infer climate safety from AR appearance.
+- Do not display hazard overlays as geographic truth unless they are correctly aligned using actual source coordinates and transformations.
+- Preserve climate-data provenance and assessment limitations.
+
+**P46 — Building Envelope Performance Analyzer**
+- Reuse supported building-envelope geometry for visualization.
+- Do not turn envelope calculation results into physically accurate spatial overlays unless their mapping is supported.
+- Preserve assessment records and staleness information.
+
+**P47 — Construction Site Logistics Planner**
+- Reuse site-logistics geometry only through actual compatible contracts.
+- Show routes and restrictions only when their coordinates and scale are correctly transformed.
+- Clearly distinguish a planning overlay from a physically marked or approved construction site.
+- Do not modify logistics plans simply by displaying them in AR.
+
+If a module is missing or incompatible, document the limitation instead of recreating it inside P48.
+
+### 16. P49–P50 BOUNDARIES
+
+P48 must remain focused on augmented-reality site visualization.
+
+- **P49 — Immersive VR Design Review:** Do not implement a VR workflow, VR scene review system, or VR-only interaction model.
+- **P50 — Live Multi-User Design Collaboration:** Do not implement simultaneous editing, collaborative anchoring, session synchronization, shared live AR states, or real-time multi-user networking.
+
+It is acceptable to document future integration points, such as how an AR session might later consume an authorized shared review state. Do not build P49 or P50 prematurely.
+
+### 17. DATA MODEL, PERSISTENCE, AND STALENESS
+
+Inspect the existing Project model and persistence architecture before adding any P48 metadata.
+
+If necessary, create an optional, backward-compatible AR visualization record using existing naming conventions.
+
+Potential data includes:
+- AR session/preview configuration ID.
+- Associated project identifier.
+- Model elements selected for display.
+- Intended scale and coordinate reference.
+- User-selected initial placement transform.
+- Alignment/calibration provenance.
+- Placement status.
+- Creation timestamp.
+- Relevant project-state fingerprint.
+- Display-layer choices.
+- Known limitations or warnings.
+
+These fields are conceptual; implement only what the actual workflow requires.
+
+Requirements:
+1. Keep AR preview state separate from canonical building geometry.
+2. Distinguish transient session state from persistent user preferences.
+3. Do not store raw camera streams or unnecessary spatial observations in the project.
+4. Preserve project IDs and unrelated metadata.
+5. Mark saved placement configuration stale when relevant project geometry or calibration changes.
+6. Do not claim a saved local transform recreates the same physical placement in a new AR session unless actual persistent anchoring supports this.
+7. Respect storage constraints.
+8. Use the existing persistence mechanism only when persistence is genuinely useful.
+9. Ensure failed or cancelled operations do not partially mutate the project.
+10. Do not create a competing persistence or versioning system.
+
+Prefer transient AR placement state when long-term persistence is not genuinely supported.
+
+### 18. USER INTERFACE AND WORKFLOW
+
+Implement a guided workspace that follows existing Plotify conventions.
+
+Suggested stages:
+
+1. **Model Selection:** Choose the project and visible geometry.
+2. **AR Capability Check:** Check required browser, device, security, and session features.
+3. **Readiness Review:** Inspect units, model bounds, coordinate information, and unsupported geometry.
+4. **Start AR:** Request permissions only after user intent.
+5. **Place & Align:** Detect a supported surface and preview placement.
+6. **Inspect:** Toggle supported layers, inspect dimensions, and adjust orientation or position.
+7. **Calibration Status:** Display whether the placement is local, manually aligned, or supported by an actual geographic/anchor system.
+8. **Exit & Review:** End the session safely and return to the ordinary viewer.
+9. **Report & Limitations:** Explain unsupported components, precision limits, and whether any placement state was saved.
+
+The exact number of UI steps may follow the existing application design, but all required capabilities and failure states must remain accessible.
+
+Include:
+- Clear unsupported-device messaging.
+- Permission-denied and session-failure states.
+- Loading and placement states.
+- Tracking-loss feedback.
+- Model bounds and scale readout.
+- Reset and cancellation controls.
+- Accessible labels and keyboard-compatible controls where supported.
+- Visible status messages that do not rely only on colour.
+
+### 19. ERROR HANDLING AND RECOVERY
+
+Handle cases including:
+- `navigator.xr` not being available.
+- `immersive-ar` being unsupported.
+- The page not running in an eligible secure context.
+- Permissions policy blocking XR.
+- User denial of camera or spatial-tracking permissions.
+- Hit-test or required feature unavailability.
+- Session startup rejection.
+- Session interruption or external termination.
+- Loss of tracking.
+- Missing or invalid project geometry.
+- Invalid dimensions or unsupported model units.
+- Renderer or WebGL initialization failure.
+- GPU or memory limits.
+- Component unmount while a session is active.
+- Stale calibration after project edits.
+- Errors while loading optional site or terrain geometry.
+
+Requirements:
+- Do not leave the camera/XR session running after a failed or cancelled workflow.
+- Do not leave listeners, animation loops, render resources, or input handlers active after exit.
+- Do not silently replace a failed AR session with a misleading fake-AR display.
+- Provide a usable route back to the normal 3D viewer.
+- Preserve all original project data after every failed or cancelled operation.
+
+### 20. TESTING AND REGRESSION
+
+Create a dedicated P48 test suite and register it in the actual system verification runner using the repository's established conventions.
+
+**A. Capability detection**
+- Supported and unsupported browser conditions.
+- Missing XR API.
+- Unsupported immersive AR.
+- Unsupported hit testing.
+- Ineligible security context.
+- Permissions-policy denial.
+- Capability changes or runtime errors.
+
+**B. Model preparation**
+- Feet-to-metres and metres-to-feet conversions.
+- Known bounding dimensions.
+- Correct axis and origin transformations.
+- Storey and floor alignment.
+- Invalid, empty or malformed model geometry.
+- Unsupported imported geometry.
+- Selected-layer visibility and model simplification.
+- Consistency between the normal 3D view and the AR scene.
+
+**C. Session lifecycle**
+- Explicit user-triggered start.
+- Successful mock session initialization.
+- Permission denial.
+- Session startup failure.
+- Session termination.
+- Component unmount and cleanup.
+- Tracking loss and recovery status.
+- No duplicate sessions or animation loops.
+- All necessary resources/listeners released on exit.
+
+**D. Placement and calibration**
+- Valid surface-hit handling where supported.
+- Missing hit-test information.
+- Placement preview and confirmation.
+- Position/orientation adjustment.
+- Scale-preservation checks.
+- Model bounds and unit consistency.
+- Reset/cancel behaviour.
+- No unintended mutation of source geometry.
+- Local placement not falsely labelled geospatial.
+
+**E. Data privacy and persistence**
+- No default camera-recording behaviour.
+- No raw camera-frame storage in project metadata.
+- Explicit user action required for optional capture.
+- Saved metadata uses the correct project identifier.
+- Stale placement configuration detection.
+- Failed or cancelled workflows preserve project state.
+
+**F. Regression**
+- Existing 3D viewer.
+- P41 IFC import/export.
+- P42 CAD import/export.
+- P43 terrain visualization and metadata.
+- P44 carbon metadata.
+- P45 climate-resilience metadata.
+- P46 envelope-assessment metadata.
+- P47 site-logistics metadata.
+- Existing persistence, versioning, and rollback behaviour.
+
+**G. System verification**
+- Run the P48 test suite.
+- Inspect and run the real full verification runner.
+- Run the actual TypeScript/lint checks.
+- Run the production build.
+
+Do not remove or weaken existing tests. Report exact commands, observed outcomes, and the actual number of suites executed.
+
+Unit tests using mocks do not prove that the AR experience works on physical devices. Where compatible hardware is available, perform a separately documented manual test matrix covering the actual tested device, operating system, browser version, feature availability, permissions, placement, and session cleanup.
+
+If physical AR testing was not possible, say so clearly. Do not claim device-level AR verification based only on successful compilation or mocked unit tests.
+
+### 21. DOCUMENTATION
+
+Create a specification following repository conventions, such as:
+
+`docs/P48_AUGMENTED_REALITY_SITE_VISUALIZATION_SPECIFICATION.md`
+
+Document:
+- Initial architecture and capability inspection.
+- Actual AR rendering approach and relevant library versions.
+- Supported devices, browsers, XR features, and required configuration.
+- Unit, origin, and coordinate transformations.
+- Real-scale placement and calibration limitations.
+- Session lifecycle and error handling.
+- Data privacy and permissions.
+- Project data and persistence behaviour.
+- P41–P47 interfaces actually reused.
+- Unsupported model components.
+- Test commands and results.
+- Physical-device test evidence, if any.
+- Known limitations and unresolved defects.
+- Future P49/P50 integration points.
+- Confirmation that P49, P50, GitHub operations, and cross-account integration were not performed.
+
+Do not document planned device support as verified support.
+
+### 22. ACCEPTANCE CRITERIA
+
+P48 is ready for review only when:
+
+1. The actual codebase and relevant P41–P47 interfaces have been inspected.
+2. The AR capability check uses genuine feature detection.
+3. Unsupported browsers and devices receive a clear, honest fallback.
+4. Session startup happens only after explicit user action.
+5. Scale and coordinate transformations are documented and tested.
+6. Local placement is not falsely represented as geographic or survey-grade alignment.
+7. The AR model remains consistent with the supported project geometry.
+8. Tracking, permissions, session termination, and rendering failures are handled.
+9. The source project is not silently modified by preview or placement.
+10. Camera and spatial data are handled according to the declared privacy rules.
+11. P41–P47 functionality and metadata remain intact.
+12. Dedicated tests, relevant regression suites, TypeScript/lint, and production build have actually been run.
+13. Any physical-device testing is accurately documented as performed or not performed.
+14. Known limitations and future integration requirements are recorded.
+15. P49–P50 have not been implemented.
+16. No GitHub operation or cross-account integration has occurred.
+17. P48 is not labelled Verified, Approved, or Complete unless the applicable checks genuinely passed.
+
+### 23. REQUIRED FINAL IMPLEMENTATION REPORT
+
+Provide a structured final report containing:
+
+1. **Initial inspection:** What the actual repository and renderer contained.
+2. **Files:** Exact paths created and modified.
+3. **AR technology:** Actual APIs, libraries, versions, and required configuration.
+4. **Capability detection:** How device/browser compatibility and permission states are checked.
+5. **Model preparation:** Supported geometry, coordinate systems, units, and scale.
+6. **Placement:** Surface detection, alignment, transforms, anchoring, and limitations.
+7. **Rendering:** Building, terrain, and supported site-layer behaviour.
+8. **Session lifecycle:** Startup, interruption, exit, tracking loss, and cleanup.
+9. **Privacy:** Permission requests, camera handling, storage, and capture behaviour.
+10. **Fallbacks:** Exact behaviour on unsupported devices and browsers.
+11. **P41–P47 compatibility:** Actual interfaces reused and regression results.
+12. **Tests:** Exact commands, outcomes, actual suite counts, and failures.
+13. **Device validation:** Actual physical-device/browser tests performed or an explicit statement that they were not performed.
+14. **Build results:** Actual TypeScript/lint and production-build outcomes.
+15. **Known limitations:** Unsupported capabilities, precision limits, and unresolved defects.
+16. **Future integration:** Shared-file risks and P49/P50 handoff points.
+17. **Scope confirmation:** Confirm P49–P50, GitHub operations, and cross-account integration were not performed.
+18. **Status:** Identify acceptance criteria passed, failed, and not yet verified.
+
+**FINAL PRIORITY: genuine AR capability, correct scale and placement, honest spatial alignment, reliable session management, privacy, stable project state, graceful compatibility fallbacks, and future integration readiness. Do not make a device appear AR-compatible simply to claim that the feature is complete.**

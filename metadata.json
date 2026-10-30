@@ -1,0 +1,6 @@
+{
+  "name": "Plotify",
+  "description": "Plotify: AI-Powered Architectural Intelligence. Architectural project management and planning platform for homeowners and architects.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

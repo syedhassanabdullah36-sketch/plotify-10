@@ -1,0 +1,1288 @@
+# P50 — LIVE MULTI-USER DESIGN COLLABORATION
+## Production-Minded Implementation Specification — Plotify Account B
+
+**Roadmap ID:** P50  
+**Feature:** Live Multi-User Design Collaboration  
+**Product:** Plotify — Architecture Intelligence Platform  
+**Implementation mode:** Inspect → Architect → Implement → Verify → Report  
+**Roadmap status:** Final locked target in the current Account B roadmap  
+**Primary objective:** Allow multiple authorized users to collaborate in real time on a shared Plotify project and review workspace, with secure membership, consistent shared state, conflict handling, durable annotations, presence, and reliable reconnection.
+
+---
+
+# 1. MISSION
+
+Implement P50 as a dependable multi-user collaboration capability integrated with the existing Plotify application.
+
+Two or more authorized users should be able to join the same collaboration workspace and see relevant shared updates without repeatedly refreshing the browser.
+
+The experience should support:
+
+- Creating a project collaboration workspace.
+- Inviting authorized collaborators.
+- Accepting, declining, revoking, and expiring invitations.
+- Showing currently connected collaborators.
+- Showing meaningful presence and activity indicators.
+- Sharing review annotations and comments.
+- Sharing supported P49 review notes and bookmarks.
+- Identifying the design element or room being discussed.
+- Seeing supported shared selections and review context.
+- Optionally sharing a selected review viewpoint through an explicit user action.
+- Handling simultaneous changes without silently losing another user's work.
+- Reconnecting after temporary network loss.
+- Showing which changes are saved, pending, failed, or synchronized.
+- Managing workspace membership and access permissions.
+- Leaving or closing a collaboration workspace safely.
+
+This must be a real collaboration architecture, not merely a user interface that displays multiple fake avatars.
+
+**Non-negotiable principle:** A user must never be shown as a verified remote participant, a shared write as successfully synchronized, or a project as collaboratively saved unless the relevant backend operation actually confirms that outcome.
+
+# 2. LOCKED ROADMAP SCOPE
+
+Implement P50 only.
+
+The locked Account B roadmap is:
+
+- P41 — OpenBIM & IFC Interoperability.
+- P42 — CAD Drawing Exchange.
+- P43 — Terrain & Topographic Site Modeling.
+- P44 — Embodied & Whole-Life Carbon Assessment.
+- P45 — Climate Hazard & Resilience Analyzer.
+- P46 — Building Envelope Performance Analyzer.
+- P47 — Construction Site Logistics Planner.
+- P48 — Augmented Reality Site Visualization.
+- P49 — Immersive VR Design Review.
+- P50 — Live Multi-User Design Collaboration — implement now.
+
+Reuse and coexist with the actual existing P41–P49 data contracts. Do not rewrite those modules, replace their authoritative calculations, or silently change their saved states.
+
+P50 may expose a shared collaboration layer around selected project records, review annotations, comments, presence, and supported review actions.
+
+P50 must not automatically synchronize arbitrary changes to every project field. Only explicitly supported, validated operations may modify persistent project or collaboration state.
+
+Do not merge Account A and Account B. Do not connect to another repository, modify GitHub, merge branches, provision new cloud infrastructure, or implement unrelated deployment work without explicit authorization.
+
+Do not add new architectural-intelligence roadmap features outside P50. The current roadmap ends at P50, but this does not prevent a later roadmap from being designed after the user's direction is established.
+
+# 3. REPOSITORY AUDIT — INSPECT BEFORE IMPLEMENTING
+
+Inspect the actual current codebase before editing any files.
+
+Previous Plotify reports describe the following stack and patterns:
+
+- React and TypeScript.
+- Vite and Tailwind CSS.
+- Three.js for 3D rendering.
+- A primarily browser-side project architecture.
+- Project persistence using local storage.
+- P49 project-scoped review metadata under `project.vrDesignReview`.
+- Existing project and versioning services.
+- A verification runner that registers P49 as Suite 21 and a separate release-gate check.
+
+These are prior report findings, not permission to assume the current repository is unchanged. Verify the actual code and configuration first.
+
+Inspect at least:
+
+## 3.1 Existing frontend and project architecture
+
+- `src/types/project.ts`
+- `src/services/storage.ts`
+- `src/services/versioningService.ts`
+- `src/types/vrDesignReview.ts`
+- `src/services/vrDesignReviewService.ts`
+- `src/components/vr/VRDesignReviewWorkspace.tsx`
+- Current 3D scene generation and rendering.
+- Current sidebar, project overview, routing, and application layout.
+- Current P49 notes, bookmarks, annotation identifiers, anchors, and fingerprints.
+- Existing workspace-specific persistence conventions.
+- Existing verification and test-registration conventions.
+
+## 3.2 Authentication and backend discovery
+
+Before selecting a synchronization architecture, identify whether the current codebase actually contains a working:
+
+- User authentication system.
+- User identity provider.
+- Shared database.
+- Realtime data service.
+- Server-side authorization layer.
+- API or backend endpoint.
+- Invitation delivery or notification service.
+- Environment configuration for external services.
+- Test or emulator configuration for the existing backend.
+
+Search the relevant dependency manifests, source files, environment examples, backend configuration, and application initialization paths.
+
+Distinguish real configured integrations from:
+
+- Unused dependencies.
+- Placeholder configuration.
+- Mock authentication.
+- Hard-coded demonstration users.
+- Local in-memory state.
+- Local storage.
+- UI controls that do not call a backend.
+
+Do not infer that authentication exists because a user-name field is present.
+
+Do not infer that realtime synchronization exists because a listener or socket-shaped interface appears in the code.
+
+## 3.3 Backend readiness decision gate
+
+The implementation must follow one of these paths.
+
+### Path A — A configured shared backend and authentication already exist
+
+Reuse the actual configured services and identity model.
+
+Build P50 through the existing authenticated API, database, or realtime transport. Preserve its permission model, deployment assumptions, and data contracts.
+
+Do not introduce a competing authentication system or duplicate project database.
+
+### Path B — A backend exists but lacks required collaboration capabilities
+
+Extend the established architecture where technically appropriate. Document missing capabilities, data migrations, security requirements, and configuration prerequisites.
+
+Do not assume that client-side filtering can replace backend authorization.
+
+### Path C — No configured authenticated shared backend exists
+
+Do not fake production multi-user collaboration.
+
+Implement the P50 domain model, provider interface, client-side workspace, state transitions, validation, readiness diagnostics, and provider tests. Create the required integration/configuration artifacts and a clearly labelled development-only collaboration test harness if useful.
+
+The live production mode must remain visibly unavailable until a genuine shared backend and authenticated identity are configured and verified.
+
+Do not automatically provision a cloud project, create paid services, publish database rules, generate credentials, or deploy external infrastructure.
+
+Do not expose secrets or ask users to paste private credentials into application source code.
+
+Report exactly what is implemented and what external setup remains necessary.
+
+**A provider abstraction or simulated collaboration test is not equivalent to a deployed live collaboration service.**
+
+# 4. ARCHITECTURE DECISION AND PROVIDER CONTRACT
+
+Use the existing technology if it satisfies the requirements. Otherwise, design a clear, replaceable collaboration-provider boundary.
+
+The P50 implementation should separate:
+
+1. Collaboration domain types.
+2. Authentication and identity.
+3. Workspace membership and authorization.
+4. Shared persistent records.
+5. Ephemeral presence and live activity.
+6. Synchronization and conflict handling.
+7. P49 integration.
+8. UI and participant workflows.
+9. Validation, testing, and telemetry limited to operational events.
+
+The provider boundary should expose well-defined operations such as:
+
+- Check backend readiness.
+- Resolve the authenticated user.
+- Create or load a workspace.
+- Invite, join, or leave a workspace.
+- Load the user's actual permissions.
+- Subscribe to authorized workspace changes.
+- Publish a validated shared operation.
+- Read authoritative server acknowledgements.
+- Observe participant presence.
+- Restore shared state after reconnect.
+- Unsubscribe and dispose of resources.
+- Report authorization failures, stale revisions, and backend errors.
+
+Adapt the contract to the existing application. Do not create a generic abstraction so elaborate that it adds no practical value.
+
+The interface must not silently treat local state as remote persistence.
+
+When no real provider is configured, return a meaningful status such as:
+
+`backend-not-configured`
+
+Keep the disabled state distinct from:
+
+- Connecting.
+- Authenticated.
+- Connected.
+- Reconnecting.
+- Read-only.
+- Permission denied.
+- Offline.
+- Session ended.
+- Backend error.
+
+Do not turn every failure into an empty collaboration list or a fake successful connection.
+
+# 5. SHARED DATA MODEL
+
+Design a versioned and project-scoped collaboration model.
+
+Use stable IDs and the actual project contract. Avoid copying the entire Plotify `Project` object into a single shared document.
+
+A suitable logical model includes the following records, adapted to existing code conventions.
+
+## 5.1 Collaboration workspace
+
+Include fields or equivalent concepts for:
+
+- Workspace ID.
+- Associated Plotify project ID.
+- Workspace schema version.
+- Created by authenticated user ID.
+- Created and updated timestamps.
+- Workspace status.
+- Membership and access policy.
+- Workspace revision or synchronization version.
+- Relevant source-project fingerprint.
+- Enabled collaboration capabilities.
+- Expiration or closure state where supported.
+- Backend synchronization status.
+
+A session or workspace ID alone must not authorize access.
+
+## 5.2 Membership records
+
+Represent:
+
+- Workspace ID.
+- Authenticated user ID.
+- Membership role.
+- Membership status.
+- Invitation or join provenance.
+- Creation and last-update timestamps.
+- Revocation state.
+- Relevant capability grants.
+
+Use the backend's authenticated identity as the authority for the user ID.
+
+Never trust a client to claim that another user has an owner or editor role.
+
+## 5.3 Invitations
+
+Represent:
+
+- Invitation ID.
+- Workspace ID.
+- Issuer.
+- Intended recipient or allowed join policy.
+- Assigned role.
+- Creation and expiration time.
+- Acceptance state.
+- Revocation state.
+- Single-use or bounded-use semantics where applicable.
+- Authoritative server-side validation status.
+
+Do not store an unprotected reusable invitation secret in a public project object.
+
+If secure invitation tokens are needed, generate them through an appropriate trusted backend mechanism. Store only the minimum necessary information; hash stored tokens when the architecture requires it.
+
+If no email or notification service exists, offer a secure invitation-link or join-code workflow only when the backend can enforce its expiry, authorization, and use limits. Do not claim an email was sent if no mail service actually delivered it.
+
+## 5.4 Presence records
+
+Presence is ephemeral, not authoritative project history.
+
+Represent only necessary information, such as:
+
+- User/session identity.
+- Workspace ID.
+- Connection state.
+- Last-seen or heartbeat information.
+- Current supported activity.
+- Selected review target, when permitted.
+- A user-selected display name or avatar reference, if supported.
+
+Do not store continuous headset poses, biometric data, camera frames, private telemetry, or unrelated behavioural analytics.
+
+## 5.5 Shared annotations and comments
+
+Support collaboration records for:
+
+- Annotation ID.
+- Workspace and project IDs.
+- Author identity.
+- Stable target element ID, if available.
+- Room or model-space anchor, where supported.
+- Text or structured note.
+- Category or label.
+- User-selected priority.
+- Created/updated timestamps.
+- Revision or version.
+- Edited-by information.
+- Deletion or tombstone state where concurrency requires it.
+- Data and anchor provenance.
+- Source-model fingerprint when relevant.
+
+Support comments or replies attached to a shared annotation when the implementation can persist and authorize them properly.
+
+Do not label a user's priority selection as a formally verified engineering risk.
+
+Preserve P49's `isVerifiedEngineeringRisk: false` or its actual equivalent. Collaboration must never promote ordinary design-review notes into verified engineering findings.
+
+## 5.6 Supported live operations
+
+Use a typed, allow-listed operation model.
+
+Examples:
+
+- Create a shared annotation.
+- Edit a permitted annotation field.
+- Add a comment.
+- Resolve or reopen an annotation.
+- Delete or tombstone an annotation when permitted.
+- Share a bookmark.
+- Select or inspect a design element.
+- Update a limited shared review-context field.
+- Join or leave a review session.
+- Update ephemeral presence.
+- Publish an explicitly supported design-change proposal.
+
+Do not accept arbitrary project JSON replacement operations from clients.
+
+Do not allow an annotation or presence event to overwrite room geometry, materials, engineering assessments, terrain, carbon calculations, or other source data.
+
+# 6. IDENTITY, SIGN-IN, AND AUTHENTICATION
+
+Use the current configured identity system.
+
+If a real authenticated identity is not available, do not grant access to a shared production workspace using a fabricated identity or plain user-name prompt.
+
+Requirements:
+
+- Resolve a stable authenticated user ID.
+- Establish the identity before opening protected collaboration data.
+- Handle expired sessions and sign-out.
+- Re-check relevant authorization after the user's access is revoked.
+- Avoid leaking authentication tokens into logs or URLs.
+- Do not trust display names, client-supplied user IDs, role labels, or workspace IDs as proof of authorization.
+- Do not weaken existing authentication to make the collaboration demo easier.
+
+If the application currently lacks authentication, document the dependency and keep the production collaboration mode disabled until an approved identity provider is configured.
+
+# 7. ROLE-BASED ACCESS CONTROL
+
+Implement clear collaboration roles appropriate to the existing project permissions.
+
+A reasonable initial model is:
+
+### Owner
+
+May manage the collaboration workspace, manage membership, invite users, assign eligible roles, revoke access, and close the workspace.
+
+### Editor
+
+May create and update allowed shared review records and perform explicitly permitted collaboration operations. Any supported modification to authoritative architectural project data must use the existing validation and mutation mechanisms with required permissions.
+
+### Reviewer
+
+May inspect shared context, add comments, and create permitted review annotations, but cannot modify protected source-project data.
+
+### Viewer
+
+May view authorized shared state but cannot make persistent changes.
+
+Map these roles to the actual existing security model where one exists.
+
+Do not assume these roles have universal powers outside the collaboration workspace.
+
+Enforce permissions on the backend for every protected write and protected read operation. Frontend disabled buttons are helpful UX, not a security boundary.
+
+Verify access during:
+
+- Workspace creation.
+- Workspace join.
+- Invitation acceptance.
+- Initial state load.
+- Realtime subscription.
+- Each persistent write.
+- Role change.
+- Invitation revocation.
+- Workspace closure.
+- Reconnection after a user's membership changes.
+
+Test that an unauthorized user cannot read another workspace by guessing or modifying an ID.
+
+# 8. REAL-TIME TRANSPORT AND SHARED PERSISTENCE
+
+Use the provider actually available in the project.
+
+If an authenticated realtime database or service already exists, inspect its semantics for persistent data, ephemeral presence, subscriptions, concurrency, offline support, and authorization before implementation.
+
+If Firebase is already configured, one possible architecture is:
+
+- Firebase Authentication for user identity.
+- Cloud Firestore for durable workspace records, memberships, annotations, comments, and revision-controlled operations.
+- Firebase Realtime Database or another suitable established realtime mechanism for ephemeral presence.
+
+This is a conditional architecture, not a requirement to add or provision Firebase when it is not configured.
+
+Official references:
+
+- Firestore security rules: https://firebase.google.com/docs/firestore/security/get-started
+- Firestore transactions: https://firebase.google.com/docs/firestore/manage-data/transactions
+- Firestore offline capabilities: https://firebase.google.com/docs/firestore/manage-data/enable-offline
+- Realtime Database presence: https://firebase.google.com/docs/database/web/offline-capabilities
+
+If an existing authenticated API and WebSocket service is used instead, enforce secure transport, authorized session establishment, origin validation, message validation, and per-action permissions.
+
+Official WebSocket security guidance:
+
+https://cheatsheetseries.owasp.org/cheatsheets/WebSocket_Security_Cheat_Sheet.html
+
+Do not create two competing authoritative stores for shared project data.
+
+## 8.1 Shared writes and acknowledgements
+
+Every persistent shared operation should have a stable operation or request ID to support duplicate detection and idempotent handling.
+
+Distinguish:
+
+- Locally edited.
+- Queued.
+- Sent.
+- Accepted by the backend.
+- Rejected.
+- Conflicted.
+- Failed.
+- Synchronized and confirmed.
+
+A successful local state update is not proof that a remote write was saved.
+
+Display a save or sync indicator that reflects the actual provider response.
+
+## 8.2 Realtime subscriptions
+
+Use subscription APIs consistent with the active provider.
+
+Requirements:
+
+- Subscribe only to authorized workspace data.
+- Clean up listeners when the workspace changes or the component unmounts.
+- Prevent duplicate subscriptions.
+- Prevent stale asynchronous responses from replacing a newer workspace.
+- Avoid unnecessary reads and listener fan-out.
+- Handle remote deletion and workspace closure.
+- Expose provider errors and authorization changes.
+- Avoid polling as a substitute for realtime functionality when an actual realtime service is available.
+
+Do not add an unsupported server or fake WebSocket solely to satisfy a checklist.
+
+# 9. CONCURRENCY AND CONFLICT RESOLUTION
+
+Concurrent editing is a central P50 requirement.
+
+Do not rely on blindly replacing entire project or collaboration documents with the last local copy.
+
+Use the strongest suitable concurrency mechanism already supported by the backend.
+
+## 9.1 Independent records
+
+Keep independently editable annotations, comments, bookmarks, and presence records separate where practical. This reduces unrelated write collisions.
+
+## 9.2 Versioned updates
+
+For persistent editable records, use an appropriate mechanism such as:
+
+- Server-side transactions.
+- Conditional writes using a revision or version.
+- Compare-and-set semantics.
+- A supported operation log with unique operation identifiers.
+- A CRDT only where the collaborative data genuinely benefits from CRDT semantics.
+
+The chosen method must fit the real backend and be documented.
+
+Where two users update the same annotation, detect competing edits rather than silently overwriting one user's changes.
+
+A useful conflict workflow should show the affected record and allow a permitted user to review, merge, or retry a conflicting change. Avoid presenting a fabricated conflict resolution when the backend cannot establish which revisions exist.
+
+## 9.3 Rich-text or free-form collaborative editing
+
+Do not introduce CRDT infrastructure just to synchronize ordinary comments.
+
+If the scope actually requires simultaneous character-by-character editing of the same rich-text document, evaluate a suitable maintained collaboration library such as Yjs and its provider model.
+
+References:
+
+- Yjs overview: https://docs.yjs.dev/
+- Yjs shared-document updates: https://docs.yjs.dev/api/document-updates
+- Yjs awareness and presence: https://docs.yjs.dev/api/about-awareness
+
+Use such a library only when it fits the existing stack and supported transport. A CRDT library without a real synchronization provider does not establish live collaboration.
+
+## 9.4 Conflict scenarios
+
+Handle at least:
+
+- Two users edit the same annotation.
+- One user deletes an annotation while another edits it.
+- Duplicate requests arrive.
+- A client sends a stale revision.
+- A user's role changes during an open session.
+- A revoked user attempts another write.
+- A workspace is closed while a client is reconnecting.
+- An interrupted client returns with pending changes.
+- Two users modify independent annotations.
+- A target model element is deleted or regenerated.
+- A network retry occurs after the server has already accepted an operation.
+
+Define deterministic behaviour and visible error/recovery states for each.
+
+# 10. REAL-TIME PRESENCE
+
+Provide an accurate participant and activity experience.
+
+Where supported, show:
+
+- Actual current participants.
+- Their permitted display names or profile information.
+- Online, reconnecting, and offline/last-seen states.
+- Their current supported review activity.
+- Selected element or annotation, when sharing is enabled.
+- A session host or owner indicator.
+
+Do not render a user as online merely because their old presence record exists in persistent storage.
+
+Use the backend's supported connection monitoring, heartbeat, lease, or disconnection handling. Where the backend provides a verified disconnect primitive, use it appropriately.
+
+For example, Firebase Realtime Database supports `onDisconnect` operations for presence cleanup, but this capability must not be assumed to exist in an unrelated provider.
+
+Throttle high-frequency cursor or pointer updates. Do not persist every cursor movement as a durable project mutation.
+
+Do not broadcast head poses, camera streams, microphone audio, eye tracking, or avatar motion by default.
+
+If a supported review interaction shares a selected element or viewpoint, make that behaviour explicit and provide a way to stop sharing it.
+
+Do not show fake typing indicators, cursors, names, or online users in production mode.
+
+# 11. SESSION CREATION, INVITATIONS, AND MEMBERSHIP
+
+Provide a coherent session lifecycle.
+
+## Create a workspace
+
+1. An authenticated and authorized user opens a Plotify project.
+2. The application checks backend readiness.
+3. The user creates a collaboration workspace for that project.
+4. The backend creates a stable workspace record and owner membership.
+5. The client confirms the resulting workspace state.
+6. The workspace becomes shareable only according to its real access policy.
+
+Do not treat locally generating an ID as proof that a shared workspace exists remotely.
+
+## Invite participants
+
+Where the backend supports it:
+
+1. The owner or authorized member chooses a role.
+2. The application creates an expiring invitation through the trusted backend.
+3. The invited person receives or uses the supported invitation mechanism.
+4. The backend validates the token, expiration, status, and requested workspace.
+5. The user must authenticate as required by the access policy.
+6. The backend creates the membership and records the invitation's acceptance.
+7. The application confirms the real membership state.
+
+Do not automatically grant project-wide access if the intended policy is collaboration-workspace-only access.
+
+## Join a workspace
+
+Require a valid authorized workspace membership or an accepted valid invitation.
+
+Display a useful message for invalid, expired, revoked, or exhausted invitations.
+
+Do not reveal protected project content before authorization succeeds.
+
+## Leave, revoke, and close
+
+Support:
+
+- A participant leaving their workspace.
+- An owner revoking a member's access.
+- An owner closing a workspace.
+- Handling the last active owner where ownership continuity matters.
+- Clearing relevant ephemeral presence.
+- Blocking writes after access revocation or workspace closure.
+
+Saved project content must not be deleted simply because a participant leaves the collaboration session.
+
+Do not delete the underlying Plotify project when closing the collaboration workspace.
+
+# 12. P49 — IMMERSIVE VR DESIGN REVIEW INTEGRATION
+
+P49 is the primary spatial-review interface that P50 can enrich through shared presence, notes, and collaborative context.
+
+Inspect the actual P49 data contracts before implementation.
+
+Reuse the existing model-anchored `VRReviewAnnotation`, `VRReviewBookmark`, geometry fingerprints, stable model identifiers, export functions, and scene metadata wherever they remain compatible.
+
+Support the following shared-review workflow:
+
+1. A collaborator selects a project and joins the authorized workspace.
+2. The P49 model and supported layers load with the existing geometry pipeline.
+3. The user's identity and workspace permissions are confirmed.
+4. Shared annotations, comments, bookmarks, and relevant review state are loaded.
+5. New permitted review changes appear to other authorized participants through the actual shared provider.
+6. A model change that invalidates an annotation anchor is surfaced as unresolved or needing review.
+7. Participants can see who created or updated a shared record.
+8. Leaving VR does not remove the saved shared review data.
+9. A disconnected participant receives an accurate reconnecting or offline state.
+10. After reconnection, shared records are reconciled before the UI claims synchronization is complete.
+
+## 12.1 Annotation identity
+
+Preserve stable annotation IDs, author attribution, model-space anchor semantics, source fingerprints, and the existing non-engineering disclaimer.
+
+Do not silently attach an unresolved annotation to an unrelated room or model element.
+
+Do not promote a review note to a verified structural, safety, geotechnical, or construction finding.
+
+## 12.2 Local and shared records
+
+Clearly distinguish:
+
+- Private/local notes, if the current P49 implementation supports them.
+- Persisted shared collaboration annotations.
+- Unsent pending changes.
+- Rejected or conflicted changes.
+
+Do not overwrite the existing `project.vrDesignReview` data structure with an incompatible shared schema.
+
+Use an explicit adapter, compatible optional field, or dedicated workspace-scoped record model as appropriate to the current contracts.
+
+## 12.3 Shared viewpoints
+
+Allow an authorized user to share a bookmark or explicitly broadcast a review viewpoint where technically supported.
+
+Do not continuously synchronize every participant's headset pose.
+
+A user accepting a shared viewpoint must not unintentionally lose unsaved work or have their camera moved without a clear action.
+
+Ensure bookmark transforms remain compatible with P49's scene units and geometry conventions.
+
+# 13. COLLABORATION ACROSS P41–P48
+
+P50 may display or share relevant review context from P41–P48, but it must not rewrite their engines.
+
+## P41 — IFC
+
+Preserve element IDs, IFC identifiers, and source metadata when available. Do not expose unsupported IFC properties as if they were present.
+
+## P42 — CAD
+
+Do not fabricate 3D geometry from 2D-only reference entities. Preserve source provenance in shared selections and notes.
+
+## P43 — Terrain
+
+Maintain terrain coordinates, units, CRS, vertical datum, and calibration provenance. Flag anchors or overlays that become stale after a terrain update.
+
+## P44 — Whole-life carbon
+
+Share actual assessment summaries only where the source data supports them. Do not convert aggregate carbon totals into fabricated per-room or per-object values.
+
+## P45 — Climate resilience
+
+Preserve coarse-grid, location, and source-data limitations. Do not turn shared annotations into certified hazard records.
+
+## P46 — Envelope performance
+
+Use existing assessment metadata and freshness indicators. A semantic façade highlight is not proof of measured physical performance.
+
+## P47 — Site logistics
+
+Preserve the distinction between coordination geometry and an approved lift plan or site-safety decision.
+
+## P48 — Augmented reality
+
+Keep P48's actual configuration and non-geospatial registration state unchanged. Do not treat a shared P48 model as survey-registered simply because collaborators can see the same project.
+
+## P49 — VR design review
+
+Share permitted review annotations, comments, bookmarks, and selected review context. Preserve existing scale, coordinate, and anchor conventions.
+
+For all integrations, verify the actual source contracts. Where data is missing or unavailable, show that limitation rather than filling in fabricated content.
+
+# 14. CONTROLLED SHARED DESIGN OPERATIONS
+
+P50 should not be limited to comments if the existing codebase supports safe shared design operations. However, it must not attempt unrestricted concurrent editing of the entire project.
+
+Start with a typed allow-list of supported collaboration operations.
+
+A supported shared design operation must:
+
+1. Identify the target project and object.
+2. Identify the requesting authenticated user.
+3. Validate membership and permission.
+4. Validate the requested operation and its payload.
+5. Confirm that the target and source revision are still valid.
+6. Apply the operation using the existing authoritative domain service where possible.
+7. Preserve required validation and constraints.
+8. Commit the result through an appropriate backend transaction or equivalent mechanism.
+9. Broadcast the authoritative accepted result to authorized participants.
+10. Handle stale edits, failed validation, and conflicting updates.
+11. Preserve versioning and rollback requirements when the underlying operation requires them.
+12. Mark dependent analysis results stale when their source data changes.
+
+Do not use a client-provided full `Project` object as an unconditional replacement for shared project state.
+
+Do not allow shared presence messages to alter authoritative project data.
+
+Do not mutate P30–P49 feature state simply because a collaborator moved their pointer, selected a room, changed a local camera, or opened a tab.
+
+If the existing codebase lacks safe concurrent-edit semantics for source architectural data, keep P50 focused on collaboration records and validated operations and document the source-editing limitation.
+
+# 15. OFFLINE MODE, RECONNECTION, AND SYNCHRONIZATION
+
+Network interruption must not silently destroy the user's work or falsely claim that changes have been shared.
+
+Provide clear states for:
+
+- Connected and synchronized.
+- Connecting.
+- Reconnecting.
+- Offline.
+- Changes pending.
+- Conflict detected.
+- Permission lost.
+- Workspace closed.
+- Backend unavailable.
+
+Support reconnection with bounded retries and sensible backoff using the actual provider conventions.
+
+When supported by the backend, recover persistent shared records after reconnection and reconcile local pending changes against current server versions.
+
+Do not queue arbitrary mutations indefinitely.
+
+Only retry operations that are safe to retry, with stable idempotency identifiers and appropriate server-side validation.
+
+For pending edits that conflict with remote changes, present a conflict workflow instead of silently overwriting data.
+
+Use last-write-wins only for fields where that behaviour is explicitly acceptable, documented, and appropriate. Do not use it as a universal policy for all shared project data.
+
+If offline persistence is supported by the selected service, distinguish server-confirmed state from cache-derived state. Do not label stale cached data as current server data.
+
+Do not claim offline collaboration between separate devices unless a genuine synchronisation mechanism exists.
+
+# 16. USER EXPERIENCE
+
+Create a dedicated collaboration workspace accessible through the current project navigation or an appropriate P49 entry point.
+
+Use Plotify's existing visual design conventions.
+
+The interface should expose:
+
+- Create or join collaboration workspace.
+- Backend readiness and connection status.
+- Current authenticated identity.
+- Participant list.
+- Workspace membership and role.
+- Invitation management.
+- Shared annotation and comment panel.
+- Shared bookmarks and selected review context.
+- Save/synchronization state.
+- Conflict and reconnect notifications.
+- Permission-related messages.
+- Leave or close workspace controls.
+- Privacy and shared-state settings.
+- A clear fallback when collaboration is unavailable.
+
+Avoid a crowded interface with multiple decorative controls.
+
+Each action must perform its stated task.
+
+Do not show “Invite sent” without a successful delivery or invitation-creation confirmation.
+
+Do not show “Saved” without confirmation from the actual persistence mechanism.
+
+Do not show remote cursors or participants as active when their session is merely simulated in a local browser.
+
+Make the difference between private, shared, pending, and server-confirmed data obvious.
+
+Support keyboard interaction, accessible names, focus indicators, readable contrast, and clear error messages.
+
+# 17. PRIVACY, SECURITY, AND AUTHORIZATION
+
+Treat collaboration as a shared-data security boundary.
+
+Do not rely on client-only checks for access control.
+
+## Authentication and transport
+
+- Require a genuine authenticated identity for protected workspace data.
+- Use the existing secure transport and identity mechanism.
+- If WebSockets are used, require secure WebSocket transport in production.
+- Validate connection origins against an explicit allow-list.
+- Validate user authentication before delivering protected data.
+- Handle session expiry and authorization changes.
+- Do not place access tokens in URL query strings.
+- Never include secrets in frontend bundles, exports, or logs.
+
+## Authorization
+
+- Enforce membership and role checks on every protected read and write where the backend supports them.
+- Validate invitations server-side.
+- Prevent unauthorized users from creating their own membership records or assigning themselves elevated roles.
+- Prevent a viewer from performing editor operations by constructing a direct API message.
+- Do not assume that access to a websocket or database connection grants permission to every operation.
+
+For Firebase, use actual Authentication and appropriate Firebase Security Rules. Never use allow-all rules in a production configuration.
+
+For a custom WebSocket backend, validate the connection origin, payload, message size, user permissions, and rate limits.
+
+## Input validation
+
+Validate every incoming shared operation against a typed schema or equivalent robust validation layer.
+
+Reject:
+
+- Unknown operations.
+- Malformed payloads.
+- Invalid workspace or project associations.
+- Oversized messages.
+- Invalid user-controlled identifiers.
+- Unsupported field paths.
+- Invalid annotation anchors.
+- Unauthorized mutations.
+- Duplicate or replayed operations when relevant.
+- Unexpected binary payloads when not supported.
+
+Use sane payload and rate limits appropriate to the provider.
+
+Escape or safely render user-submitted text. Do not inject collaboration comments into raw HTML.
+
+## Privacy
+
+Do not add:
+
+- Camera frame capture.
+- Microphone recording.
+- Eye tracking.
+- Biometric analysis.
+- Unnecessary behavioural analytics.
+- Continuous headset-pose telemetry uploads.
+- Automatic external sharing of project files.
+- Unnecessary collection of participant location information.
+
+Share only the data necessary for the collaboration capability selected by the user.
+
+Avoid logging complete comments, authentication tokens, invitation secrets, or sensitive project contents.
+
+Log operational events in a manner consistent with the existing privacy and security design.
+
+# 18. RESOURCE MANAGEMENT AND PERFORMANCE
+
+Live collaboration must not make the core Plotify application sluggish.
+
+Requirements:
+
+- Use efficient subscriptions rather than repeatedly downloading the complete project.
+- Send only necessary deltas or typed operations.
+- Throttle ephemeral pointer and selection updates.
+- Debounce appropriate non-critical UI updates.
+- Avoid sending a Three.js scene graph across the network.
+- Avoid broadcasting every rendering frame or camera transform.
+- Avoid rerendering the entire project when an independent annotation changes.
+- Avoid duplicate listeners and subscriptions.
+- Release resources on workspace exit or unmount.
+- Bound in-memory queued operations.
+- Handle an unusually large participant list or comment collection safely.
+- Use pagination, bounded history, or incremental loading where appropriate.
+- Avoid hot documents or uncontrolled update bursts when the backend has per-document limits.
+- Handle backpressure or provider throttling.
+- Preserve the performance of the standard 3D viewer and P49 VR session.
+
+Do not invent a specific participant limit or performance guarantee. If the architecture requires a configured initial limit, document it and provide a safe way to reject excess load.
+
+# 19. DATA RETENTION AND WORKSPACE LIFECYCLE
+
+Use bounded persistence and clear deletion rules.
+
+Define what happens when:
+
+- A member leaves.
+- An invitation expires.
+- A user is removed.
+- A workspace is closed.
+- A project is deleted through the supported existing workflow.
+- A shared annotation is deleted.
+- A participant loses authentication.
+- A source object is removed or regenerated.
+
+Closing a collaboration workspace must not accidentally delete the source architectural project.
+
+Deleting a participant's membership must not automatically erase the entire shared project.
+
+Respect the existing product retention and user-data model.
+
+If a cleanup job or scheduled expiry mechanism is required, implement it only through an available supported backend pattern. Do not claim server-side expiry based solely on a browser timer.
+
+Preserve useful author and timestamp metadata for shared review records as supported by the privacy policy and existing application conventions.
+
+# 20. TEST STRATEGY
+
+Inspect the existing test runner, add a dedicated P50 suite, and register it using current conventions.
+
+Do not weaken, delete, or suppress existing P01–P49 tests.
+
+Use realistic fixtures and explicit assertions. A mock transport is useful for automated tests but is not proof of live network collaboration.
+
+## Group A — Backend readiness and provider selection
+
+Test:
+
+- Existing configured backend detection.
+- Missing provider configuration.
+- Missing authentication.
+- Unsupported provider.
+- Connection startup failure.
+- Invalid runtime configuration.
+- Correct distinction between test-only mock and production provider.
+- Live collaboration disabled when the necessary backend is absent.
+- No fake online status in disabled mode.
+
+## Group B — Identity and membership
+
+Test:
+
+- Authorized user creates a workspace.
+- Unauthenticated user cannot create protected shared state.
+- Authorized member joins.
+- Uninvited user is denied.
+- Workspace ID guessing does not bypass access control.
+- Membership and role come from authoritative state.
+- Owner, editor, reviewer, and viewer permissions.
+- Role downgrade takes effect.
+- Revoked membership blocks subsequent reads/writes as applicable.
+- Expired or revoked invitation is denied.
+
+## Group C — Invitation lifecycle
+
+Test:
+
+- Invitation creation.
+- Invalid invitation token.
+- Expired invitation.
+- Revoked invitation.
+- Accepted invitation cannot be replayed when single-use is required.
+- Recipient authentication or policy validation.
+- Role assignment stays within the inviter's authority.
+- Closing a workspace invalidates pending invitations where applicable.
+- No false “sent” or “accepted” notification.
+
+## Group D — Realtime synchronization
+
+Where a real backend is configured, test with two independently authenticated clients or the supported backend emulator.
+
+Test:
+
+- Client A creates a workspace or supported record.
+- Client B receives the authoritative shared update.
+- An annotation created by A appears for B.
+- B's permitted change appears for A.
+- Remote deletion is handled.
+- A reconnecting client obtains current shared state.
+- A client with the wrong workspace subscription receives no protected data.
+- An unauthorized writer is rejected by the backend.
+- Backend acknowledgement is distinguished from local optimistic state.
+
+If the environment has only a mock provider, report these as mock-transport tests, not live-backend integration tests.
+
+## Group E — Concurrency and conflict resolution
+
+Test:
+
+- Two independent annotations are updated concurrently.
+- Two clients edit the same annotation.
+- Edit-versus-delete conflict.
+- Duplicate operation delivery.
+- Retry after an accepted but unacknowledged operation.
+- Stale base revision.
+- Workspace closed during a write.
+- Role changes during an open subscription.
+- Reconnect with conflicting pending operations.
+- Conflict-resolution UI reflects the actual server revisions.
+
+## Group F — Presence and ephemeral state
+
+Test:
+
+- Authenticated participant becomes visible after valid connection.
+- Presence disappears or becomes stale after disconnect.
+- Browser tab closes unexpectedly.
+- Two tabs with the same user ID are distinguished as separate client sessions where needed.
+- A remote pointer/selection update does not mutate the project.
+- Stale cursors are removed.
+- Presence update rate is limited.
+- No camera, microphone, eye-tracking, or head-pose telemetry is collected.
+- Fake participants appear only in the explicit test harness.
+
+## Group G — P49 integration
+
+Test:
+
+- A shared P49 annotation appears to another authorized client.
+- Saved P49 bookmarks can be shared where allowed.
+- Annotation IDs and stable anchors remain valid.
+- Deleted model elements produce unresolved anchors.
+- Non-engineering annotation status remains intact.
+- P49's existing local records are preserved.
+- Project geometry is not overwritten by shared presence.
+- Closing a collaboration workspace does not erase ordinary P49 records.
+- P49 VR exit and resource cleanup still work.
+- Unsupported P41–P48 metadata is not fabricated.
+
+## Group H — P41–P48 coexistence
+
+Test:
+
+- IFC identifiers remain intact.
+- 2D-only CAD entities are not fabricated into 3D objects.
+- Terrain metadata is preserved.
+- Carbon data is read-only unless a separately authorised operation explicitly supports a change.
+- Climate-resilience provenance is preserved.
+- Envelope assessment status is not altered by collaboration.
+- Site-logistics overlays remain read-only unless a supported operation exists.
+- AR and VR configuration are not overwritten by presence or shared cursor updates.
+- Missing optional source data does not crash the collaboration workspace.
+
+## Group I — Network resilience
+
+Test:
+
+- Disconnection while idle.
+- Disconnection during an annotation edit.
+- Reconnection with no pending changes.
+- Reconnection with pending changes.
+- Server conflict after reconnect.
+- Authentication expires during an active session.
+- Permission is revoked while connected.
+- Backend returns an error.
+- Repeated reconnect attempts are bounded.
+- The UI does not label pending writes as synchronized.
+
+## Group J — Security and abuse resistance
+
+Test:
+
+- Unauthorized workspace read.
+- Unauthorized operation type.
+- Invalid payload shape.
+- Oversized message.
+- Malformed annotations.
+- Script-like text rendered safely.
+- Role escalation attempts.
+- Invitation-token reuse.
+- Rate-limit behaviour where implemented.
+- Origin validation for a custom WebSocket backend, when applicable.
+- No secret values in logs or exports.
+- No production security rule that grants every user unrestricted access.
+
+Use the backend's supported emulator or security test tools where available.
+
+## Group K — Persistence, retention, and regression
+
+Test:
+
+- Saved workspace state survives reload.
+- Legacy Plotify project without P50 data loads normally.
+- Leaving does not delete the source project.
+- Workspace close preserves underlying project data.
+- Owner revocation changes actual membership.
+- Shared annotation persistence.
+- Duplicate operation handling.
+- Bounded message/history storage.
+- No stale subscription after changing projects.
+- Full existing P01–P49 regression tests.
+
+## Group L — User experience and accessibility
+
+Test:
+
+- Backend unavailable.
+- No authenticated user.
+- No workspace selected.
+- Invitation invalid or expired.
+- Reconnecting state.
+- Unsaved changes.
+- Conflict requiring review.
+- Permission denied.
+- Workspace closed.
+- Keyboard navigation and accessible labels where supported.
+- Clear distinction between live production mode and test-only demo mode.
+
+# 21. VERIFICATION AND RELEASE GATES
+
+After implementation:
+
+1. Run the dedicated P50 test suite.
+2. Run the complete existing verification runner, including P01–P49 and the appropriate release gates.
+3. Run the actual lint or type-check command.
+4. Run the production build.
+5. Inspect the complete final diff.
+6. Verify the current test-suite count against the actual runner output.
+7. Confirm that P49 remains usable and its annotations/bookmarks are preserved.
+8. Confirm that existing architectural and discipline data is not overwritten by P50.
+9. Confirm that no Account A integration occurred.
+10. Confirm that no GitHub changes or cloud provisioning occurred.
+11. Verify any applicable security rules or backend policy files with the supported tools.
+12. Distinguish mock-provider tests, emulator tests, real backend integration tests, and manual multi-client testing.
+
+If a real shared backend is available, perform an actual two-client collaboration test using distinct authenticated sessions. Record exactly what was tested.
+
+If the environment cannot perform this test, say so. Do not infer multi-user capability from unit tests or a successful build.
+
+If the backend is not configured, do not count a simulated collaboration flow as a successful live collaboration test.
+
+If a pre-existing runner defect affects results, document it instead of silently rewriting unrelated logic or claiming an unsupported pass.
+
+# 22. DOCUMENTATION AND REFERENCES
+
+Create concise technical documentation consistent with existing conventions.
+
+Document:
+
+- P50 architecture.
+- Backend readiness decision and selected provider.
+- Authentication and authorization model.
+- Workspace and membership data model.
+- Invitation and revocation lifecycle.
+- Presence semantics.
+- Shared record model.
+- Conflict-resolution strategy.
+- Reconnection and pending-write behaviour.
+- P49 integration.
+- P41–P48 coexistence.
+- Data retention and privacy boundaries.
+- Required configuration and environment variables.
+- Security policy files or rules.
+- Tests and commands actually executed.
+- Known limitations and deployment prerequisites.
+
+Useful official references:
+
+- Firebase Firestore Security Rules: https://firebase.google.com/docs/firestore/security/get-started
+- Firebase Firestore Transactions: https://firebase.google.com/docs/firestore/manage-data/transactions
+- Firebase Firestore Offline Capabilities: https://firebase.google.com/docs/firestore/manage-data/enable-offline
+- Firebase Realtime Database Web Presence: https://firebase.google.com/docs/database/web/offline-capabilities
+- OWASP WebSocket Security Cheat Sheet: https://cheatsheetseries.owasp.org/cheatsheets/WebSocket_Security_Cheat_Sheet.html
+- Yjs overview: https://docs.yjs.dev/
+- Yjs Document Updates: https://docs.yjs.dev/api/document-updates
+- Yjs Awareness: https://docs.yjs.dev/api/about-awareness
+
+Verify the current documentation and APIs against the actual chosen provider and installed versions.
+
+Do not claim a source proves that an unrelated implementation is secure. Document the actual security policy and test evidence.
+
+# 23. REQUIRED ACCEPTANCE CRITERIA
+
+P50 is ready for checkpoint review only when all applicable criteria below have been addressed.
+
+## A. Genuine collaboration
+
+- A dedicated collaboration workspace exists.
+- Authorized users can create and join through the actual supported identity and backend.
+- Two distinct authenticated clients can receive shared updates through the real configured provider.
+- The UI distinguishes test-only simulation from live collaboration.
+- Local-only mode is never presented as internet-wide collaboration.
+
+## B. Shared state
+
+- Supported annotations and collaboration records persist.
+- Participants can see authorized remote changes.
+- Shared bookmarks or review context work where implemented.
+- Backend acknowledgements control the synchronized status.
+- Reconnection recovers or reconciles current shared state.
+
+## C. Access control
+
+- Membership and roles are enforced at the authoritative backend.
+- Unauthorized users cannot read or write protected workspaces.
+- Invitation expiry and revocation work.
+- Role changes take effect.
+- Protected project state is not exposed before authorization.
+
+## D. Concurrency and recovery
+
+- Simultaneous edits do not silently overwrite unrelated user work.
+- Duplicate operations are handled safely.
+- Stale revisions and conflicts have a defined recovery workflow.
+- Permission loss and session closure stop unauthorized operations.
+- Pending edits are not falsely marked synchronized.
+
+## E. P49 and existing product coexistence
+
+- P49 annotations and bookmarks are reused compatibly.
+- Shared presence cannot overwrite model geometry.
+- P41–P48 source metadata remains intact.
+- Existing project persistence remains compatible.
+- Leaving or closing a workspace does not delete the source project.
+- Existing module behaviour passes regression tests.
+
+## F. Security and quality
+
+- Authenticated identity, role checks, and data validation are implemented.
+- Sensitive secrets and tokens are not exposed.
+- Actual security rules or backend authorization are validated where available.
+- P50 tests, full regression verification, type check, and production build results are accurately reported.
+- No unrelated infrastructure or account integration is introduced.
+- Documentation matches actual behaviour.
+
+## G. Backend readiness
+
+If no real authenticated shared backend is configured, the P50 feature must be marked **foundation implemented / live collaboration not yet operational**, as appropriate. Do not declare the genuine live-collaboration acceptance criteria complete.
+
+Any unmet acceptance criterion must be explicitly marked incomplete, failed, or not tested.
+
+# 24. FINAL IMPLEMENTATION REPORT — REQUIRED FORMAT
+
+Return the final report with the following sections:
+
+1. **Implementation summary** — what actually works.
+2. **Repository and backend audit** — actual authentication, database, transport, and persistence architecture.
+3. **Backend readiness outcome** — configured production provider, incomplete configuration, or missing backend.
+4. **Files created and modified** — exact paths and purpose.
+5. **Collaboration data model** — actual records and schema versions.
+6. **Authentication and authorization** — implemented identity, roles, rules, and verification evidence.
+7. **Workspace and invitation lifecycle** — working creation, join, invitation, revocation, and closure flows.
+8. **Realtime synchronization** — actual transport, subscription lifecycle, acknowledgements, and shared operations.
+9. **Concurrency and conflict handling** — supported semantics and tested cases.
+10. **Presence and shared review context** — actual behaviour and privacy controls.
+11. **P49 integration and P41–P48 coexistence** — what was reused and what remained unchanged.
+12. **Offline and reconnect behaviour** — actual capabilities and limitations.
+13. **Security review** — verified access controls, input validation, secret handling, and remaining risks.
+14. **Tests** — exact commands, suite counts, and whether each was unit, mock-provider, emulator, real-backend integration, or manual multi-client testing.
+15. **Build and type check** — exact commands and outcomes.
+16. **Known limitations and external setup** — real blockers and deployment prerequisites.
+17. **Scope confirmation** — no Account A integration, no P51 or later feature added, no unauthorized infrastructure or repository changes.
+18. **Acceptance checklist** — passed, failed, incomplete, or not tested, with evidence.
+
+Include a clear top-line status:
+
+- `LIVE COLLABORATION VERIFIED IN TEST ENVIRONMENT`
+- `IMPLEMENTED — REAL BACKEND TESTING STILL REQUIRED`
+- `FOUNDATION IMPLEMENTED — BACKEND CONFIGURATION REQUIRED`
+- `INCOMPLETE — BLOCKED BY SPECIFIED DEFECTS`
+
+Use only the status supported by the actual work.
+
+Do not claim a deployment, a real-time multi-user test, or a security verification that did not occur.
+
+# 25. FINAL EXECUTION INSTRUCTION
+
+Begin by inspecting the actual Account B codebase, especially the authentication, persistence, backend configuration, P49 collaboration-related records, and current verification runner.
+
+Produce the internal implementation plan and exact file-change inventory before editing.
+
+Choose the collaboration architecture based on what actually exists. Implement the strongest safe version of P50 supported by the current infrastructure.
+
+If a working backend and identity system exist, implement real authenticated multi-user collaboration and test using distinct clients.
+
+If the backend does not exist, implement the typed P50 foundation and provider boundary, create the safe configuration artifacts, keep production live mode unavailable, and report precisely what is needed to complete true collaboration. Do not stop at vague recommendations, but do not pretend missing infrastructure exists.
+
+Run the available tests and build, inspect the final changes, and deliver the complete implementation report in the same task.
+
+Preserve existing functionality. Avoid unrestricted whole-project synchronization, fake participants, client-only authorization, and silent conflict overwrites.
+
+Do not wait for additional confirmation to perform this scoped implementation. Do not connect Account A and Account B, modify GitHub, provision cloud services, or begin unrelated infrastructure changes.
+
+**P50's goal is to let authorized people work together on the same Plotify design with consistent shared state, meaningful collaboration, and trustworthy access controls—not merely to make multiple browser windows look synchronized.**
